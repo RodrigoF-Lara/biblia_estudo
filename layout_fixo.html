@@ -474,7 +474,8 @@
 
       .left-grid {
         grid-template-columns: 1fr 1fr 1fr 1.45fr;
-        grid-template-rows: var(--scripture-height);
+        grid-template-rows: auto;
+        align-items: start;
       }
 
       .col {
@@ -489,8 +490,10 @@
       }
 
       .scripture-body {
-        height: calc(var(--scripture-height) - 24px);
+        height: auto;
         display: flex;
+        align-items: flex-start;
+        overflow: visible;
       }
 
       .study-col {
@@ -499,13 +502,13 @@
         border-left: 1px solid var(--line);
         padding-left: 14px;
         min-height: 0;
-        height: var(--scripture-height);
-        overflow: hidden;
+        height: auto;
+        overflow: visible;
       }
 
       .study-main-body {
         height: auto;
-        overflow: hidden;
+        overflow: visible;
       }
 
       .study-overflow-left {
@@ -515,7 +518,7 @@
 
       .study-overflow-left-body {
         height: auto;
-        overflow: hidden;
+        overflow: visible;
       }
 
       .right-layout {
@@ -534,7 +537,7 @@
 
       .study-overflow-right-body {
         height: auto;
-        overflow: hidden;
+        overflow: visible;
       }
 
       .image-box { min-height: 50vh; }
@@ -958,6 +961,10 @@
       };
     }
 
+    function isMobileViewport() {
+      return window.matchMedia('(max-width: 1200px)').matches;
+    }
+
     function distributeStudyText(estudoCompleto) {
       const studyMainEl = document.getElementById('estudo-content-main');
       const studyMainBody = document.getElementById('study-main-body');
@@ -971,6 +978,17 @@
       const incompleteNote = document.getElementById('estudo-incomplete-note');
 
       if (!studyMainEl || !studyMainBody || !studyLeftOverflowEl || !studyLeftOverflowBody || !studyRightOverflowEl || !studyRightOverflowBody || !leftOverflowWrap || !rightOverflowWrap || !rightLayout || !incompleteNote) {
+        return;
+      }
+
+      if (isMobileViewport()) {
+        studyMainEl.textContent = estudoCompleto || '';
+        studyLeftOverflowEl.textContent = '';
+        studyRightOverflowEl.textContent = '';
+        leftOverflowWrap.hidden = true;
+        rightOverflowWrap.hidden = true;
+        rightLayout.classList.add('no-overflow');
+        incompleteNote.hidden = true;
         return;
       }
 
@@ -1068,6 +1086,19 @@
     }
 
     function fitA4Layout() {
+      if (isMobileViewport()) {
+        const leftBody = document.getElementById('left-page-body');
+        const rightLayout = document.getElementById('right-layout');
+        if (leftBody) {
+          leftBody.style.height = 'auto';
+        }
+        if (rightLayout) {
+          rightLayout.style.height = 'auto';
+          rightLayout.style.setProperty('--right-top-size', '30%');
+        }
+        return;
+      }
+
       fitLeftPageToA4();
       fitRightPageToA4();
     }
