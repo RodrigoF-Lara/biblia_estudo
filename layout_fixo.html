@@ -422,7 +422,18 @@
     .study-overflow-right-body {
       flex: 1;
       min-height: 0;
-      overflow: hidden;
+      overflow: visible;
+    }
+
+    #page-right {
+      height: auto;
+      max-height: none;
+      overflow: visible;
+    }
+
+    #page-right .right-layout {
+      height: auto;
+      grid-template-rows: auto auto;
     }
 
     .incomplete-note {
@@ -1003,25 +1014,11 @@
       studyLeftOverflowEl.textContent = part2.main;
       leftOverflowWrap.hidden = !part2.main;
 
-      let part3;
-      if (part2.overflow) {
-        incompleteNote.hidden = true;
-        part3 = splitTextByRenderedHeight(part2.overflow, studyRightOverflowEl, studyRightOverflowBody, 0);
-
-        if (part3.overflow) {
-          // Reserva espaco do aviso para garantir que ele sempre apareca quando houver corte.
-          incompleteNote.hidden = false;
-          const noteReserve = Math.ceil(incompleteNote.getBoundingClientRect().height + 12);
-          part3 = splitTextByRenderedHeight(part2.overflow, studyRightOverflowEl, studyRightOverflowBody, noteReserve);
-        }
-      } else {
-        part3 = { main: '', overflow: '' };
-      }
-
-      studyRightOverflowEl.textContent = part3.main;
-      rightOverflowWrap.hidden = !part3.main;
-      rightLayout.classList.toggle('no-overflow', !part3.main);
-      incompleteNote.hidden = !part3.overflow;
+      // A pagina 2 nao tem limite de altura: recebe todo o restante do estudo sem cortes.
+      studyRightOverflowEl.textContent = part2.overflow || '';
+      rightOverflowWrap.hidden = !part2.overflow;
+      rightLayout.classList.toggle('no-overflow', !part2.overflow);
+      incompleteNote.hidden = true;
     }
 
     async function renderFromMarkdown() {
@@ -1100,7 +1097,6 @@
       }
 
       fitLeftPageToA4();
-      fitRightPageToA4();
     }
 
     function fitLeftPageToA4() {
