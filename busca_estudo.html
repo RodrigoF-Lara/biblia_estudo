@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Busca De Estudos Biblicos</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Source+Sans+3:wght@400;600;700&display=swap');
+
+    :root {
+      --bg: #ece4d5;
+      --paper: #f8f4ea;
+      --ink: #211c18;
+      --muted: #6d6258;
+      --line: #d5c8b5;
+      --accent: #8a5a2b;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Source Sans 3', sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 85% 10%, #e3d5be 0%, transparent 38%),
+        radial-gradient(circle at 10% 90%, #d9cab0 0%, transparent 35%),
+        var(--bg);
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .panel {
+      width: min(880px, 100%);
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
+      padding: 26px;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 42px;
+      letter-spacing: 0.4px;
+    }
+
+    .subtitle {
+      margin: 4px 0 18px;
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    label {
+      display: grid;
+      gap: 4px;
+      font-size: 14px;
+      color: #5f544b;
+      font-weight: 600;
+    }
+
+    select,
+    input,
+    button {
+      height: 44px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      font-size: 16px;
+      padding: 0 12px;
+      font-family: inherit;
+      background: #fffdf8;
+      color: var(--ink);
+    }
+
+    button {
+      background: #2f2418;
+      color: #f8f2e7;
+      border-color: #2f2418;
+      font-weight: 700;
+      cursor: pointer;
+      min-width: 140px;
+    }
+
+    button:hover { filter: brightness(1.07); }
+
+    .result {
+      margin-top: 16px;
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+      color: #4f463f;
+      min-height: 46px;
+    }
+
+    .result strong { color: #2f2418; }
+
+    .hint {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 860px) {
+      form { grid-template-columns: 1fr; }
+      button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="panel">
+    <h1>Busca De Estudos Biblicos</h1>
+    <p class="subtitle">Escolha livro, capitulo e versiculo para abrir automaticamente o layout fixo.</p>
+
+    <form id="form-busca">
+      <label>
+        Livro
+        <select id="livro" required></select>
+      </label>
+
+      <label>
+        Capitulo
+        <input id="capitulo" type="number" min="1" step="1" required />
+      </label>
+
+      <label>
+        Versiculo
+        <input id="versiculo" type="number" min="1" step="1" required />
+      </label>
+
+      <button type="submit">Abrir Estudo</button>
+    </form>
+
+    <div class="result" id="resultado"></div>
+    <p class="hint">Regra: se voce buscar, por exemplo, versiculo 3 e existir um estudo 1-5, o sistema abre esse estudo.</p>
+  </main>
+
+  <script>
+    let estudos = [];
+    const params = new URLSearchParams(window.location.search);
+
+    async function carregarIndice() {
+      const res = await fetch('estudos_index.json');
+      if (!res.ok) {
+        throw new Error('Nao foi possivel ler estudos_index.json');
+      }
+      const data = await res.json();
+      estudos = Array.isArray(data.estudos) ? data.estudos : [];
+      popularLivros();
+    }
+
+    function popularLivros() {
+      const select = document.getElementById('livro');
+      const livros = [...new Set(estudos.map(e => e.livro))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+      select.innerHTML = livros.map(l => '<option value="' + l + '">' + l + '</option>').join('');
+
+      const livroParam = params.get('livro');
+      const capituloParam = params.get('capitulo');
+      const versiculoParam = params.get('versiculo');
+
+      if (livroParam && livros.includes(livroParam)) {
+        select.value = livroParam;
+      }
+      if (capituloParam) {
+        document.getElementById('capitulo').value = capituloParam;
+      }
+      if (versiculoParam) {
+        document.getElementById('versiculo').value = versiculoParam;
+      }
+    }
+
+    function buscarEstudo(livro, capitulo, versiculo) {
+      const candidatos = estudos
+        .filter(e =>
+          e.livro.toLowerCase() === livro.toLowerCase() &&
+          Number(e.capitulo) === Number(capitulo) &&
+          Number(versiculo) >= Number(e.versiculoInicio) &&
+          Number(versiculo) <= Number(e.versiculoFim)
+        )
+        .sort((a, b) => {
+          const spanA = Number(a.versiculoFim) - Number(a.versiculoInicio);
+          const spanB = Number(b.versiculoFim) - Number(b.versiculoInicio);
+          return spanA - spanB;
+        });
+
+      return candidatos[0] || null;
+    }
+
+    function mostrarNaoEncontrado(livro, capitulo, versiculo) {
+      const resultado = document.getElementById('resultado');
+      const faixas = estudos
+        .filter(e => e.livro.toLowerCase() === livro.toLowerCase() && Number(e.capitulo) === Number(capitulo))
+        .map(e => e.versiculoInicio + '-' + e.versiculoFim)
+        .join(', ');
+
+      if (faixas) {
+        resultado.innerHTML = 'Nenhum estudo cobre <strong>' + livro + ' ' + capitulo + ':' + versiculo + '</strong>. Faixas disponiveis neste capitulo: <strong>' + faixas + '</strong>.';
+      } else {
+        resultado.innerHTML = 'Nenhum estudo cadastrado para <strong>' + livro + ' ' + capitulo + '</strong> ainda.';
+      }
+    }
+
+    document.getElementById('form-busca').addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      const livro = document.getElementById('livro').value;
+      const capitulo = Number(document.getElementById('capitulo').value);
+      const versiculo = Number(document.getElementById('versiculo').value);
+
+      const estudo = buscarEstudo(livro, capitulo, versiculo);
+      if (!estudo) {
+        mostrarNaoEncontrado(livro, capitulo, versiculo);
+        return;
+      }
+
+      const resultado = document.getElementById('resultado');
+      resultado.innerHTML = 'Abrindo <strong>' + estudo.titulo + '</strong>...';
+      window.location.href = 'layout_fixo.html?estudoId=' + encodeURIComponent(estudo.id);
+    });
+
+    carregarIndice().catch(err => {
+      document.getElementById('resultado').textContent = err.message;
+    });
+  </script>
+</body>
+</html>

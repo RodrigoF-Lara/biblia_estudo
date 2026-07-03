@@ -1,0 +1,29 @@
+{
+  "estudos": [
+    {
+      "id": "atos_1_1_5",
+      "livro": "Atos",
+      "capitulo": 1,
+      "versiculoInicio": 1,
+      "versiculoFim": 5,
+      "titulo": "Atos 1:1-5",
+      "markdownPath": "Atos/At_1/1_5.md",
+      "imageDir": "Atos/At_1/img",
+      "additionalStudyUrl": "https://drive.google.com/file/d/1UjmPvTefNTzwePmzRKvsOEgwNY7wjMDF/view?usp=drive_link",
+      "layout": "v2"
+    },
+    {
+      "id": "atos_1_6_11",
+      "livro": "Atos",
+      "capitulo": 1,
+      "versiculoInicio": 6,
+      "versiculoFim": 11,
+      "titulo": "Atos 1:6-11",
+      "markdownPath": "Atos/At_1/6_11.md",
+      "imageDir": "Atos/At_1/img",
+      "additionalStudyUrl": "https://drive.google.com/file/d/1UjmPvTefNTzwePmzRKvsOEgwNY7wjMDF/view?usp=drive_link",
+      "layout": "v2"
+    }
+
+  ]
+}

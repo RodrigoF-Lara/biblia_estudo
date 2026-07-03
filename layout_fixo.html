@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Modelo Visual 01 V2 - Atos 1:1-5</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Source+Sans+3:wght@400;600;700&display=swap');
+
+    :root {
+      --paper: #f8f3e8;
+      --ink: #1f1a17;
+      --muted: #645a52;
+      --line: #d5c9b8;
+      --line-soft: #ddd3c5;
+      --accent: #8a5a2b;
+      --bg: #e8dfd0;
+      --scripture-height: 176mm;
+      --scripture-font-size: 12.4px;
+      --scripture-line-height: 1.3;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 20%, #efe5d6 0%, transparent 30%),
+        radial-gradient(circle at 90% 80%, #dfcfb7 0%, transparent 35%),
+        var(--bg);
+      font-family: 'Source Sans 3', sans-serif;
+      padding: 24px;
+    }
+
+    .spread {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(280px, 210mm));
+      gap: 16px;
+      justify-content: center;
+      align-items: start;
+    }
+
+    .page {
+      width: 210mm;
+      height: 297mm;
+      max-height: 297mm;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
+      padding: 14mm 10mm;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .qr-corner {
+      width: 23mm;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.72);
+      border-radius: 8px;
+      padding: 4px;
+      flex: 0 0 auto;
+    }
+
+    .qr-corner strong {
+      display: block;
+      font-size: 9px;
+      letter-spacing: 0.3px;
+      color: #5f5348;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .qr-corner img {
+      width: 100%;
+      display: block;
+      border-radius: 4px;
+      border: 1px solid #d8ccb9;
+      background: #fff;
+    }
+
+    .qr-link {
+      display: block;
+      margin-top: 4px;
+      font-size: 9px;
+      color: #4d4138;
+      text-decoration: none;
+      word-break: break-word;
+      line-height: 1.2;
+    }
+
+    .page::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.03),
+        rgba(0, 0, 0, 0.03) 1px,
+        transparent 1px,
+        transparent 5px
+      );
+      opacity: 0.12;
+      pointer-events: none;
+    }
+
+    .header {
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      position: relative;
+      z-index: 1;
+      flex: 0 0 auto;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .header-main {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .switch-study-btn {
+      border: 1px solid #c7b9a5;
+      background: #f8f1e3;
+      color: #46372a;
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      line-height: 1;
+      white-space: nowrap;
+      margin-top: 4px;
+    }
+
+    .study-nav {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-top: 4px;
+    }
+
+    .nav-arrow {
+      width: 30px;
+      height: 30px;
+      display: inline-grid;
+      place-items: center;
+      border: 1px solid #c7b9a5;
+      background: #f8f1e3;
+      color: #46372a;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .nav-arrow[aria-disabled="true"] {
+      opacity: 0.45;
+      pointer-events: none;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 34px;
+      letter-spacing: 0.6px;
+      font-weight: 700;
+    }
+
+    .header p {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .left-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1.45fr;
+      grid-template-rows: var(--scripture-height);
+      column-gap: 10px;
+      row-gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .left-page-body {
+      height: 100%;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: var(--scripture-height) minmax(0, 1fr);
+      row-gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .col {
+      padding: 0 10px;
+      min-height: 0;
+      min-width: 0;
+      animation: fadeUp 0.7s ease both;
+    }
+
+    .col:nth-child(2) { animation-delay: 0.1s; }
+    .col:nth-child(3) { animation-delay: 0.2s; }
+    .col:nth-child(4) { animation-delay: 0.3s; }
+
+    .col h2 {
+      margin: 0 0 8px;
+      font-size: 11px;
+      letter-spacing: 0.9px;
+      color: #7a7067;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .col p {
+      margin: 0 0 7px;
+      font-size: 12.4px;
+      line-height: 1.42;
+    }
+
+    .content-text {
+      margin: 0;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+      font-size: 12.4px;
+      line-height: 1.42;
+      font-family: 'Source Sans 3', sans-serif;
+    }
+
+    .scripture-col {
+      grid-row: 1;
+      padding-top: 2px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .scripture-body {
+      height: calc(var(--scripture-height) - 24px);
+      display: flex;
+      align-items: center;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .scripture-body.tight {
+      align-items: flex-start;
+      padding-top: 2px;
+    }
+
+    .scripture-col .content-text {
+      font-size: var(--scripture-font-size);
+      line-height: var(--scripture-line-height);
+    }
+
+    .scripture-divider {
+      border-right: 1px solid var(--line-soft);
+    }
+
+    .study-col {
+      grid-column: 4;
+      grid-row: 1;
+      border-left: 1px solid var(--line);
+      padding-left: 14px;
+      padding-right: 0;
+      height: var(--scripture-height);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .study-main-body {
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .study-col h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      letter-spacing: 0.4px;
+      text-transform: none;
+      color: #433a34;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .study-col .content-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 16px;
+      line-height: 1.34;
+      font-weight: 700;
+      color: #302823;
+      white-space: pre-line;
+    }
+
+    .study p {
+      font-size: 12px;
+      line-height: 1.36;
+    }
+
+    .study-overflow-left {
+      border-top: 1px solid var(--line);
+      padding: 10px 2px 0;
+      min-height: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .study-overflow-left h3 {
+      margin: 0 0 8px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.85px;
+      text-transform: uppercase;
+      color: #756b62;
+      font-family: 'Source Sans 3', sans-serif;
+    }
+
+    .study-overflow-left-body {
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .study-overflow-left .content-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 16px;
+      line-height: 1.34;
+      font-weight: 700;
+      color: #302823;
+      white-space: pre-line;
+    }
+
+    .right-layout {
+      display: grid;
+      grid-template-rows: var(--right-top-size, 30%) minmax(0, 1fr);
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+      min-height: 0;
+      height: 100%;
+    }
+
+    .right-top {
+      display: grid;
+      grid-template-rows: 1fr;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .right-layout.no-overflow {
+      grid-template-rows: 1fr;
+    }
+
+    .image-box {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #f1e9dc;
+      min-height: 0;
+      height: 100%;
+    }
+
+    .image-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .caption {
+      padding: 6px 8px;
+      border-top: 1px solid var(--line);
+      font-size: 12px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    .study-overflow-right {
+      border-top: 1px solid var(--line);
+      padding: 10px 2px 0;
+      min-height: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .study-overflow-right h3 {
+      margin: 0 0 8px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.85px;
+      text-transform: uppercase;
+      color: #756b62;
+      font-family: 'Source Sans 3', sans-serif;
+    }
+
+    .study-overflow-right .content-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 16px;
+      line-height: 1.34;
+      font-weight: 700;
+      color: #302823;
+      white-space: pre-line;
+    }
+
+    .study-overflow-right-body {
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .incomplete-note {
+      margin-top: 10px;
+      border-top: 1px dashed var(--line-soft);
+      padding-top: 8px;
+      font-size: 11px;
+      font-family: 'Source Sans 3', sans-serif;
+      color: #6f645b;
+      letter-spacing: 0.2px;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 1200px) {
+      body { padding: 12px; }
+      .spread { grid-template-columns: 1fr; }
+      .page {
+        width: min(100%, 210mm);
+        height: auto;
+        max-height: none;
+      }
+      .left-page-body {
+        grid-template-rows: auto;
+      }
+      .left-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+      }
+      .col {
+        min-height: auto;
+        padding: 0;
+      }
+      .scripture-col {
+        border-right: none;
+        border-bottom: 1px solid var(--line-soft);
+        padding-bottom: 10px;
+      }
+      .scripture-body {
+        height: auto;
+        display: block;
+      }
+      .study-col {
+        grid-column: auto;
+        grid-row: auto;
+        border-left: none;
+        padding-left: 0;
+        min-height: auto;
+        height: auto;
+        overflow: visible;
+      }
+      .study-main-body {
+        height: auto;
+        overflow: visible;
+      }
+      .study-overflow-left {
+        border-top: none;
+        padding: 0;
+      }
+      .study-overflow-left-body {
+        height: auto;
+        overflow: visible;
+      }
+      .right-layout {
+        grid-template-rows: auto;
+        min-height: 0;
+        height: auto;
+      }
+      .right-top { grid-template-rows: auto; }
+      .study-overflow-right {
+        border-top: none;
+        padding: 0;
+        min-height: 0;
+      }
+      .study-overflow-right-body {
+        height: auto;
+        overflow: visible;
+      }
+      .image-box { min-height: 50vh; }
+      .header-top {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .header-row {
+        flex-direction: column;
+      }
+      .qr-corner {
+        width: min(180px, 100%);
+      }
+    }
+
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+
+      body {
+        background: white;
+        padding: 0;
+      }
+      .spread {
+        display: block;
+      }
+      .page {
+        box-shadow: none;
+        border: none;
+        margin: 0;
+        page-break-after: always;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="spread">
+    <section class="page" id="page-left">
+      <header class="header" id="header-left">
+        <div class="header-row">
+          <div class="header-main">
+            <div class="header-top">
+              <h1 id="titulo-principal">Atos 1:1-5</h1>
+              <div class="study-nav">
+                <a class="nav-arrow" id="prev-study-link" href="" title="Estudo anterior" aria-label="Estudo anterior" aria-disabled="true">&#8592;</a>
+                <a class="nav-arrow" id="next-study-link" href="" title="Proximo estudo" aria-label="Proximo estudo" aria-disabled="true">&#8594;</a>
+                <a class="switch-study-btn" id="switch-study-link" href="busca_estudo.html">Trocar estudo</a>
+              </div>
+            </div>
+            <p>Painel de estudo: texto biblico em paralelo e comentario expositivo</p>
+          </div>
+
+          <aside class="qr-corner" id="qr-left-wrap" hidden>
+            <strong>Estudos extras</strong>
+            <img id="qr-left-img" alt="QR code para estudos adicionais" />
+            <a class="qr-link" id="qr-left-link" target="_blank" rel="noreferrer">Abrir link</a>
+          </aside>
+        </div>
+      </header>
+
+      <div class="left-page-body" id="left-page-body">
+        <div class="left-grid">
+          <article class="col scripture-col scripture-divider">
+            <h2>NVI</h2>
+            <div class="scripture-body">
+              <p class="content-text" id="nvi-content"></p>
+            </div>
+          </article>
+
+          <article class="col scripture-col scripture-divider">
+            <h2>NAA</h2>
+            <div class="scripture-body">
+              <p class="content-text" id="naa-content"></p>
+            </div>
+          </article>
+
+          <article class="col scripture-col">
+            <h2>NLT (Ingles)</h2>
+            <div class="scripture-body">
+              <p class="content-text" id="nlt-content"></p>
+            </div>
+          </article>
+
+          <article class="col study study-col">
+            <h2>Estudo Biblico</h2>
+            <div class="study-main-body" id="study-main-body">
+              <p class="content-text" id="estudo-content-main"></p>
+            </div>
+          </article>
+        </div>
+
+        <section class="study-overflow-left" id="study-overflow-left-wrap" hidden>
+          <h3>Continuacao do Estudo Biblico</h3>
+          <div class="study-overflow-left-body" id="study-overflow-left-body">
+            <p class="content-text" id="estudo-content-overflow-left"></p>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="page" id="page-right">
+      <header class="header" id="header-right">
+        <div class="header-row">
+          <div class="header-main">
+            <h1>Painel De Imagens</h1>
+            <p>Leitura visual do trecho para contemplacao, memoria e ensino</p>
+          </div>
+
+          <aside class="qr-corner" id="qr-right-wrap" hidden>
+            <strong>Estudos extras</strong>
+            <img id="qr-right-img" alt="QR code para estudos adicionais" />
+            <a class="qr-link" id="qr-right-link" target="_blank" rel="noreferrer">Abrir link</a>
+          </aside>
+        </div>
+      </header>
+
+      <div class="right-layout" id="right-layout">
+        <section class="right-top">
+          <figure class="image-box">
+            <img id="img-main" src="img/atos_1_5%20-1.png" alt="Cena inspirada em Atos 1:1-5" />
+            <figcaption class="caption" id="img-caption">Atos 1:1-3 | Testemunho da ressurreicao e preparo dos apostolos</figcaption>
+          </figure>
+        </section>
+
+        <section class="study-overflow-right" id="study-overflow-right-wrap" hidden>
+          <h3>Continuacao do Estudo Biblico</h3>
+          <div class="study-overflow-right-body" id="study-overflow-right-body">
+            <p class="content-text" id="estudo-content-overflow-right"></p>
+            <p class="incomplete-note" id="estudo-incomplete-note" hidden>Texto de estudo incompleto nesta composicao A4. Continue na proxima pagina do estudo.</p>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const requestedStudyId = params.get('estudoId');
+    const requestedMdPath = params.get('md');
+
+    let resolvedStudy = null;
+    let resolvedMdPath = requestedMdPath || 'Atos/At_1/1_5.md';
+    let resolvedImageDir = 'Atos/At_1/img';
+    let resolvedAdditionalUrl = '';
+    let studiesIndex = [];
+    let currentStudyText = '';
+
+    function deriveImageDirFromMarkdownPath(markdownPath) {
+      const normalized = (markdownPath || '').replace(/\\/g, '/');
+      const parts = normalized.split('/');
+      parts.pop();
+      return (parts.join('/') || '.') + '/img';
+    }
+
+    async function resolveStudyConfig() {
+      if (!requestedStudyId && !requestedMdPath) {
+        resolvedImageDir = deriveImageDirFromMarkdownPath(resolvedMdPath);
+        return;
+      }
+
+      if (requestedStudyId) {
+        const response = await fetch('estudos_index.json');
+        if (!response.ok) {
+          throw new Error('Falha ao carregar estudos_index.json');
+        }
+
+        const index = await response.json();
+        const estudos = Array.isArray(index.estudos) ? index.estudos : [];
+        studiesIndex = estudos;
+        const found = estudos.find(item => item.id === requestedStudyId);
+        if (!found) {
+          throw new Error('Estudo nao encontrado no indice');
+        }
+
+        resolvedStudy = found;
+        resolvedMdPath = found.markdownPath;
+        resolvedImageDir = found.imageDir || deriveImageDirFromMarkdownPath(found.markdownPath);
+        resolvedAdditionalUrl = found.additionalStudyUrl || '';
+        return;
+      }
+
+      resolvedImageDir = deriveImageDirFromMarkdownPath(resolvedMdPath);
+    }
+
+    function extractFirstUrl(text) {
+      const match = (text || '').match(/https?:\/\/[^\s)]+/i);
+      return match ? match[0] : '';
+    }
+
+    function setQrLinks(url) {
+      const leftWrap = document.getElementById('qr-left-wrap');
+      const rightWrap = document.getElementById('qr-right-wrap');
+      const leftImg = document.getElementById('qr-left-img');
+      const rightImg = document.getElementById('qr-right-img');
+      const leftLink = document.getElementById('qr-left-link');
+      const rightLink = document.getElementById('qr-right-link');
+
+      const all = [leftWrap, rightWrap, leftImg, rightImg, leftLink, rightLink];
+      if (all.some(el => !el)) {
+        return;
+      }
+
+      if (!url) {
+        leftWrap.hidden = true;
+        rightWrap.hidden = true;
+        return;
+      }
+
+      const qrSrc = 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' + encodeURIComponent(url);
+      leftImg.src = qrSrc;
+      rightImg.src = qrSrc;
+      leftLink.href = url;
+      rightLink.href = url;
+      leftLink.textContent = 'Acessar material';
+      rightLink.textContent = 'Acessar material';
+      leftWrap.hidden = false;
+      rightWrap.hidden = false;
+    }
+
+    function updatePrevNextLinks() {
+      const prevLink = document.getElementById('prev-study-link');
+      const nextLink = document.getElementById('next-study-link');
+      if (!prevLink || !nextLink) {
+        return;
+      }
+
+      const disable = (el) => {
+        el.href = '';
+        el.setAttribute('aria-disabled', 'true');
+      };
+      const enable = (el, id) => {
+        el.href = 'layout_fixo.html?estudoId=' + encodeURIComponent(id);
+        el.setAttribute('aria-disabled', 'false');
+      };
+
+      if (!resolvedStudy || !studiesIndex.length) {
+        disable(prevLink);
+        disable(nextLink);
+        return;
+      }
+
+      const currentIndex = studiesIndex.findIndex(item => item.id === resolvedStudy.id);
+      if (currentIndex < 0) {
+        disable(prevLink);
+        disable(nextLink);
+        return;
+      }
+
+      const prev = studiesIndex[currentIndex - 1];
+      const next = studiesIndex[currentIndex + 1];
+
+      if (prev && prev.id) {
+        enable(prevLink, prev.id);
+      } else {
+        disable(prevLink);
+      }
+
+      if (next && next.id) {
+        enable(nextLink, next.id);
+      } else {
+        disable(nextLink);
+      }
+    }
+
+    function parseMarkdownSections(md) {
+      const lines = md.replace(/\r/g, '').split('\n');
+      let title = 'Atos 1:1-5';
+      const sections = {};
+      let current = null;
+
+      for (const line of lines) {
+        const h1 = line.match(/^#\s+(.+)$/);
+        if (h1) {
+          title = h1[1].trim();
+          continue;
+        }
+
+        const h2 = line.match(/^##\s+(.+)$/);
+        if (h2) {
+          current = h2[1].trim().toLowerCase();
+          sections[current] = [];
+          continue;
+        }
+
+        if (current) {
+          sections[current].push(line);
+        }
+      }
+
+      const normalized = {};
+      for (const key of Object.keys(sections)) {
+        normalized[key] = sections[key].join('\n').trim();
+      }
+      return { title, sections: normalized };
+    }
+
+    function getSection(sections, names) {
+      for (const name of names) {
+        const key = name.toLowerCase();
+        if (sections[key]) {
+          return sections[key];
+        }
+      }
+      return '';
+    }
+
+    function extractImageList(imagesText) {
+      return imagesText
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.startsWith('- '))
+        .map(line => line.slice(2).trim())
+        .filter(item => item && !item.toLowerCase().includes('pasta recomendada'));
+    }
+
+    function normalizeStudyText(text) {
+      return (text || '')
+        .replace(/\r/g, '')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+    }
+
+    function fitScriptureColumns() {
+      const ids = ['nvi-content', 'naa-content', 'nlt-content'];
+      const pairs = ids
+        .map(id => {
+          const p = document.getElementById(id);
+          if (!p || !p.parentElement) {
+            return null;
+          }
+          return { p, body: p.parentElement };
+        })
+        .filter(Boolean);
+
+      if (!pairs.length) {
+        return;
+      }
+
+      const root = document.documentElement;
+      const maxFont = 12.4;
+      const minFont = 6.6;
+      const step = 0.2;
+
+      pairs.forEach(({ body }) => body.classList.add('tight'));
+
+      let size = maxFont;
+      root.style.setProperty('--scripture-font-size', size.toFixed(1) + 'px');
+
+      const fitsAll = () =>
+        pairs.every(({ p, body }) => p.scrollHeight <= body.clientHeight + 1);
+
+      while (!fitsAll() && size > minFont) {
+        size -= step;
+        root.style.setProperty('--scripture-font-size', size.toFixed(1) + 'px');
+      }
+
+      // Se couber no tamanho base, mantem centralizado para preservar estetica de livro.
+      if (Math.abs(size - maxFont) < 0.11) {
+        pairs.forEach(({ body }) => body.classList.remove('tight'));
+      }
+    }
+
+    function splitTextByRenderedHeight(text, contentEl, containerEl, reservePx = 0) {
+      const clean = (text || '').trim();
+      if (!clean) {
+        return { main: '', overflow: '' };
+      }
+
+      const usableHeight = Math.max(0, containerEl.clientHeight - reservePx);
+      if (usableHeight <= 0) {
+        return { main: '', overflow: clean };
+      }
+
+      contentEl.textContent = clean;
+      if (contentEl.scrollHeight <= usableHeight) {
+        return { main: clean, overflow: '' };
+      }
+
+      let low = 0;
+      let high = clean.length;
+      let best = 0;
+
+      while (low <= high) {
+        const mid = Math.floor((low + high) / 2);
+        let cut = clean.lastIndexOf(' ', mid);
+        if (cut < Math.floor(mid * 0.6)) {
+          cut = mid;
+        }
+
+        const candidate = clean.slice(0, cut).trim();
+        contentEl.textContent = candidate;
+
+        if (contentEl.scrollHeight <= usableHeight) {
+          best = cut;
+          low = mid + 1;
+        } else {
+          high = mid - 1;
+        }
+      }
+
+      let finalCut = best;
+      const paragraphCut = clean.lastIndexOf('\n\n', best);
+      if (paragraphCut > 0) {
+        const paragraphCandidate = clean.slice(0, paragraphCut).trim();
+        contentEl.textContent = paragraphCandidate;
+        if (contentEl.scrollHeight <= usableHeight) {
+          finalCut = paragraphCut;
+        }
+      }
+
+      if (finalCut <= 0) {
+        finalCut = best;
+      }
+
+      return {
+        main: clean.slice(0, finalCut).trim(),
+        overflow: clean.slice(finalCut).trim()
+      };
+    }
+
+    function distributeStudyText(estudoCompleto) {
+      const studyMainEl = document.getElementById('estudo-content-main');
+      const studyMainBody = document.getElementById('study-main-body');
+      const studyLeftOverflowEl = document.getElementById('estudo-content-overflow-left');
+      const studyLeftOverflowBody = document.getElementById('study-overflow-left-body');
+      const studyRightOverflowEl = document.getElementById('estudo-content-overflow-right');
+      const studyRightOverflowBody = document.getElementById('study-overflow-right-body');
+      const leftOverflowWrap = document.getElementById('study-overflow-left-wrap');
+      const rightOverflowWrap = document.getElementById('study-overflow-right-wrap');
+      const rightLayout = document.querySelector('.right-layout');
+      const incompleteNote = document.getElementById('estudo-incomplete-note');
+
+      if (!studyMainEl || !studyMainBody || !studyLeftOverflowEl || !studyLeftOverflowBody || !studyRightOverflowEl || !studyRightOverflowBody || !leftOverflowWrap || !rightOverflowWrap || !rightLayout || !incompleteNote) {
+        return;
+      }
+
+      leftOverflowWrap.hidden = false;
+      rightOverflowWrap.hidden = false;
+      rightLayout.classList.remove('no-overflow');
+
+      const part1 = splitTextByRenderedHeight(estudoCompleto, studyMainEl, studyMainBody);
+      studyMainEl.textContent = part1.main;
+
+      const part2 = splitTextByRenderedHeight(part1.overflow, studyLeftOverflowEl, studyLeftOverflowBody);
+      studyLeftOverflowEl.textContent = part2.main;
+      leftOverflowWrap.hidden = !part2.main;
+
+      let part3;
+      if (part2.overflow) {
+        incompleteNote.hidden = true;
+        part3 = splitTextByRenderedHeight(part2.overflow, studyRightOverflowEl, studyRightOverflowBody, 0);
+
+        if (part3.overflow) {
+          // Reserva espaco do aviso para garantir que ele sempre apareca quando houver corte.
+          incompleteNote.hidden = false;
+          const noteReserve = Math.ceil(incompleteNote.getBoundingClientRect().height + 12);
+          part3 = splitTextByRenderedHeight(part2.overflow, studyRightOverflowEl, studyRightOverflowBody, noteReserve);
+        }
+      } else {
+        part3 = { main: '', overflow: '' };
+      }
+
+      studyRightOverflowEl.textContent = part3.main;
+      rightOverflowWrap.hidden = !part3.main;
+      rightLayout.classList.toggle('no-overflow', !part3.main);
+      incompleteNote.hidden = !part3.overflow;
+    }
+
+    async function renderFromMarkdown() {
+      try {
+        await resolveStudyConfig();
+
+        const response = await fetch(resolvedMdPath);
+        if (!response.ok) {
+          throw new Error('Falha ao ler o markdown');
+        }
+
+        const md = await response.text();
+        const { title, sections } = parseMarkdownSections(md);
+        const mdAdditionalUrl = extractFirstUrl(getSection(sections, ['estudos adicionais', 'link estudos adicionais', 'estudo adicional']));
+        const finalAdditionalUrl = mdAdditionalUrl || resolvedAdditionalUrl;
+        setQrLinks(finalAdditionalUrl);
+
+        if (document.fonts && document.fonts.ready) {
+          await document.fonts.ready;
+        }
+
+        document.getElementById('titulo-principal').textContent = title;
+        if (resolvedStudy) {
+          document.querySelector('#header-left p').textContent = 'Painel de estudo | ' + resolvedStudy.livro + ' ' + resolvedStudy.capitulo + ':' + resolvedStudy.versiculoInicio + '-' + resolvedStudy.versiculoFim + ' | NVI, NAA, NLT e Estudo Biblico';
+          document.getElementById('switch-study-link').href =
+            'busca_estudo.html?livro=' + encodeURIComponent(resolvedStudy.livro) +
+            '&capitulo=' + encodeURIComponent(String(resolvedStudy.capitulo)) +
+            '&versiculo=' + encodeURIComponent(String(resolvedStudy.versiculoInicio));
+        }
+        updatePrevNextLinks();
+        document.getElementById('nvi-content').textContent = getSection(sections, ['nvi']);
+        document.getElementById('naa-content').textContent = getSection(sections, ['naa']);
+        document.getElementById('nlt-content').textContent = getSection(sections, ['nlt (ingles)', 'nlt', 'ntl (ingles)', 'ntl']);
+        fitScriptureColumns();
+        const estudoCompleto = normalizeStudyText(getSection(sections, ['estudo biblico', 'estudo ia']));
+        currentStudyText = estudoCompleto;
+
+        const imagesSection = getSection(sections, ['imagens']);
+        const imageNames = extractImageList(imagesSection);
+        const imagePaths = imageNames.map(name => resolvedImageDir + '/' + encodeURIComponent(name));
+
+        const main = imagePaths[0];
+
+        if (main) {
+          document.getElementById('img-main').src = main;
+        }
+
+        if (title) {
+          document.getElementById('img-main').alt = 'Cena inspirada em ' + title;
+          document.getElementById('img-caption').textContent = title + ' | Imagens de apoio ao estudo';
+        }
+
+        // Primeiro estabiliza o layout A4, depois distribui o texto e recalcula com as alturas finais.
+        fitA4Layout();
+        distributeStudyText(currentStudyText);
+        fitA4Layout();
+        distributeStudyText(currentStudyText);
+        fitA4Layout();
+      } catch (error) {
+        document.getElementById('img-caption').textContent = 'Nao foi possivel carregar o markdown automaticamente. Abra o HTML via servidor local no VS Code.';
+      }
+    }
+
+    function fitA4Layout() {
+      fitLeftPageToA4();
+      fitRightPageToA4();
+    }
+
+    function fitLeftPageToA4() {
+      const page = document.getElementById('page-left');
+      const header = document.getElementById('header-left');
+      const body = document.getElementById('left-page-body');
+      if (!page || !header || !body) {
+        return;
+      }
+
+      const available = page.clientHeight - header.offsetHeight - 12;
+      if (available > 0) {
+        body.style.height = available + 'px';
+      }
+    }
+
+    function fitRightPageToA4() {
+      const page = document.getElementById('page-right');
+      const header = document.getElementById('header-right');
+      const layout = document.getElementById('right-layout');
+      const rightTop = layout ? layout.querySelector('.right-top') : null;
+      const overflowWrap = document.getElementById('study-overflow-right-wrap');
+
+      if (!page || !header || !layout || !rightTop || !overflowWrap) {
+        return;
+      }
+
+      const available = page.clientHeight - header.offsetHeight - 12;
+      if (available > 0) {
+        layout.style.height = available + 'px';
+      }
+
+      // Reset dos estados antes de medir.
+      layout.style.setProperty('--right-top-size', '30%');
+
+      if (overflowWrap.hidden) {
+        return;
+      }
+
+      const fits = () => layout.scrollHeight <= layout.clientHeight + 1;
+
+      // Prioridade 1: reduzir area de imagens (metade superior da pagina direita).
+      let topRatio = 30;
+      while (!fits() && topRatio > 18) {
+        topRatio -= 2;
+        layout.style.setProperty('--right-top-size', topRatio + '%');
+      }
+    }
+
+    window.addEventListener('resize', () => {
+      fitA4Layout();
+      fitScriptureColumns();
+      if (currentStudyText) {
+        distributeStudyText(currentStudyText);
+        fitA4Layout();
+      }
+    });
+
+    renderFromMarkdown();
+  </script>
+</body>
+</html>
