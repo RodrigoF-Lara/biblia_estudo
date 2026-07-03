@@ -447,79 +447,108 @@
     }
 
     @media (max-width: 1200px) {
-      body { padding: 12px; }
-      .spread { grid-template-columns: 1fr; }
+      body {
+        padding: 8px;
+        overflow-x: auto;
+      }
+
+      .spread {
+        display: flex;
+        gap: 12px;
+        width: max-content;
+        min-width: 100%;
+        align-items: flex-start;
+      }
+
       .page {
-        width: min(100%, 210mm);
+        width: 210mm;
+        min-width: 210mm;
         height: auto;
         max-height: none;
+        overflow: visible;
       }
+
       .left-page-body {
         grid-template-rows: auto;
       }
+
       .left-grid {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto;
+        grid-template-columns: 1fr 1fr 1fr 1.45fr;
+        grid-template-rows: var(--scripture-height);
       }
+
       .col {
-        min-height: auto;
-        padding: 0;
+        min-height: 0;
+        padding: 0 8px;
       }
+
       .scripture-col {
         border-right: none;
-        border-bottom: 1px solid var(--line-soft);
-        padding-bottom: 10px;
+        border-bottom: none;
+        padding-bottom: 0;
       }
+
       .scripture-body {
-        height: auto;
-        display: block;
+        height: calc(var(--scripture-height) - 24px);
+        display: flex;
       }
+
       .study-col {
-        grid-column: auto;
-        grid-row: auto;
-        border-left: none;
-        padding-left: 0;
-        min-height: auto;
-        height: auto;
-        overflow: visible;
+        grid-column: 4;
+        grid-row: 1;
+        border-left: 1px solid var(--line);
+        padding-left: 14px;
+        min-height: 0;
+        height: var(--scripture-height);
+        overflow: hidden;
       }
+
       .study-main-body {
         height: auto;
-        overflow: visible;
+        overflow: hidden;
       }
+
       .study-overflow-left {
-        border-top: none;
-        padding: 0;
+        border-top: 1px solid var(--line);
+        padding: 10px 2px 0;
       }
+
       .study-overflow-left-body {
         height: auto;
-        overflow: visible;
+        overflow: hidden;
       }
+
       .right-layout {
-        grid-template-rows: auto;
+        grid-template-rows: var(--right-top-size, 30%) minmax(0, 1fr);
         min-height: 0;
-        height: auto;
+        height: 100%;
       }
+
       .right-top { grid-template-rows: auto; }
+
       .study-overflow-right {
-        border-top: none;
-        padding: 0;
+        border-top: 1px solid var(--line);
+        padding: 10px 2px 0;
         min-height: 0;
       }
+
       .study-overflow-right-body {
         height: auto;
-        overflow: visible;
+        overflow: hidden;
       }
+
       .image-box { min-height: 50vh; }
       .header-top {
         flex-direction: column;
         align-items: flex-start;
       }
+
       .header-row {
         flex-direction: column;
       }
+
       .qr-corner {
-        width: min(180px, 100%);
+        width: 23mm;
       }
     }
 
