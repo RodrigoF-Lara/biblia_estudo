@@ -474,61 +474,17 @@
       .page {
         width: 210mm;
         min-width: 210mm;
+      }
+
+      #page-left {
+        height: 297mm;
+        max-height: 297mm;
+        overflow: hidden;
+      }
+
+      #page-right {
         height: auto;
         max-height: none;
-        overflow: visible;
-      }
-
-      .left-page-body {
-        grid-template-rows: auto;
-      }
-
-      .left-grid {
-        grid-template-columns: 1fr 1fr 1fr 1.45fr;
-        grid-template-rows: auto;
-        align-items: start;
-      }
-
-      .col {
-        min-height: 0;
-        padding: 0 8px;
-      }
-
-      .scripture-col {
-        border-right: none;
-        border-bottom: none;
-        padding-bottom: 0;
-      }
-
-      .scripture-body {
-        height: auto;
-        display: flex;
-        align-items: flex-start;
-        overflow: visible;
-      }
-
-      .study-col {
-        grid-column: 4;
-        grid-row: 1;
-        border-left: 1px solid var(--line);
-        padding-left: 14px;
-        min-height: 0;
-        height: auto;
-        overflow: visible;
-      }
-
-      .study-main-body {
-        height: auto;
-        overflow: visible;
-      }
-
-      .study-overflow-left {
-        border-top: 1px solid var(--line);
-        padding: 10px 2px 0;
-      }
-
-      .study-overflow-left-body {
-        height: auto;
         overflow: visible;
       }
 
@@ -538,7 +494,12 @@
         height: 100%;
       }
 
-      .right-top { grid-template-rows: auto; }
+      #page-right .right-layout {
+        height: auto;
+        grid-template-rows: auto auto;
+      }
+
+      #page-right .right-top { grid-template-rows: auto; }
 
       .study-overflow-right {
         border-top: 1px solid var(--line);
@@ -551,7 +512,7 @@
         overflow: visible;
       }
 
-      .image-box { min-height: 50vh; }
+      #page-right .image-box { min-height: 50vh; }
       .header-top {
         flex-direction: column;
         align-items: flex-start;
@@ -992,17 +953,6 @@
         return;
       }
 
-      if (isMobileViewport()) {
-        studyMainEl.textContent = estudoCompleto || '';
-        studyLeftOverflowEl.textContent = '';
-        studyRightOverflowEl.textContent = '';
-        leftOverflowWrap.hidden = true;
-        rightOverflowWrap.hidden = true;
-        rightLayout.classList.add('no-overflow');
-        incompleteNote.hidden = true;
-        return;
-      }
-
       leftOverflowWrap.hidden = false;
       rightOverflowWrap.hidden = false;
       rightLayout.classList.remove('no-overflow');
@@ -1084,11 +1034,8 @@
 
     function fitA4Layout() {
       if (isMobileViewport()) {
-        const leftBody = document.getElementById('left-page-body');
+        fitLeftPageToA4();
         const rightLayout = document.getElementById('right-layout');
-        if (leftBody) {
-          leftBody.style.height = 'auto';
-        }
         if (rightLayout) {
           rightLayout.style.height = 'auto';
           rightLayout.style.setProperty('--right-top-size', '30%');
