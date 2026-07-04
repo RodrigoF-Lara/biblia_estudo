@@ -31,6 +31,7 @@ No painel: SQL Editor
 
 1. Abra o arquivo supabase_setup.sql deste projeto.
 2. Copie e execute todo o script.
+3. Se voce ja tinha executado antes, execute novamente a versao atual para criar os novos campos (bairro) e a tabela user_private_data.
 
 ## 4) Tornar seu usuario admin
 Depois do seu primeiro login:
@@ -48,6 +49,8 @@ on conflict (user_id) do nothing;
 3. No card Conta, digite email e clique Entrar.
 4. Clique no link recebido no email.
 5. Volte ao site e confirme "Sessao ativa".
+6. Clique em "Completar perfil", preencha nome, nascimento, cidade, bairro, foto e CPF.
+7. Clique em "Salvar perfil" e confirme a mensagem de sucesso.
 
 ## 6) Teste em producao (GitHub Pages)
 1. Publique com seu comando d -Message "...".
@@ -58,3 +61,4 @@ on conflict (user_id) do nothing;
 - Nunca use service_role no frontend.
 - A anon key pode ficar no frontend.
 - Se o link do email abrir e nao logar, quase sempre falta ajustar Redirect URLs.
+- CPF nao e salvo em texto puro: o frontend envia hash + 4 ultimos digitos para user_private_data.
