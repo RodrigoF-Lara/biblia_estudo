@@ -23,6 +23,18 @@
       "imageDir": "Atos/At_1/img",
       "additionalStudyUrl": "https://drive.google.com/file/d/1UjmPvTefNTzwePmzRKvsOEgwNY7wjMDF/view?usp=drive_link",
       "layout": "v2"
+    },
+    {
+      "id": "atos_1_12_14",
+      "livro": "Atos",
+      "capitulo": 1,
+      "versiculoInicio": 12,
+      "versiculoFim": 14,
+      "titulo": "Atos 1:12-14",
+      "markdownPath": "Atos/At_1/12_14.md",
+      "imageDir": "Atos/At_1/img",
+      "additionalStudyUrl": "https://drive.google.com/file/d/1UjmPvTefNTzwePmzRKvsOEgwNY7wjMDF/view?usp=drive_link",
+      "layout": "v2"
     }
 
   ]
