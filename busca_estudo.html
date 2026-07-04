@@ -109,6 +109,79 @@
       font-size: 14px;
     }
 
+    .studies-title {
+      margin: 18px 0 8px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      font-size: 14px;
+      letter-spacing: 0.7px;
+      color: #6a5e53;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .studies-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .study-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: #fffdf8;
+    }
+
+    .study-meta {
+      min-width: 0;
+    }
+
+    .study-ref {
+      margin: 0;
+      font-size: 13px;
+      color: #776b61;
+      letter-spacing: 0.2px;
+    }
+
+    .study-name {
+      margin: 2px 0 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: #2f2418;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .study-open {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #2f2418;
+      background: #2f2418;
+      color: #f8f2e7;
+      text-decoration: none;
+      border-radius: 8px;
+      height: 34px;
+      padding: 0 10px;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .studies-empty {
+      border: 1px dashed var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      color: var(--muted);
+      font-size: 14px;
+      background: rgba(255, 255, 255, 0.55);
+    }
+
     @media (max-width: 860px) {
       form { grid-template-columns: 1fr; }
       button { width: 100%; }
@@ -141,6 +214,9 @@
 
     <div class="result" id="resultado"></div>
     <p class="hint">Regra: se voce buscar, por exemplo, versiculo 3 e existir um estudo 1-5, o sistema abre esse estudo.</p>
+
+    <h2 class="studies-title">Estudos Disponiveis</h2>
+    <section class="studies-list" id="lista-estudos"></section>
   </main>
 
   <script>
@@ -155,6 +231,45 @@
       const data = await res.json();
       estudos = Array.isArray(data.estudos) ? data.estudos : [];
       popularLivros();
+      renderListaEstudos();
+    }
+
+    function renderListaEstudos() {
+      const listEl = document.getElementById('lista-estudos');
+      if (!listEl) {
+        return;
+      }
+
+      if (!estudos.length) {
+        listEl.innerHTML = '<div class="studies-empty">Nenhum estudo cadastrado ainda.</div>';
+        return;
+      }
+
+      const ordenados = [...estudos].sort((a, b) => {
+        const livroComp = String(a.livro).localeCompare(String(b.livro), 'pt-BR');
+        if (livroComp !== 0) {
+          return livroComp;
+        }
+        const capComp = Number(a.capitulo) - Number(b.capitulo);
+        if (capComp !== 0) {
+          return capComp;
+        }
+        return Number(a.versiculoInicio) - Number(b.versiculoInicio);
+      });
+
+      listEl.innerHTML = ordenados.map(estudo => {
+        const ref = estudo.livro + ' ' + estudo.capitulo + ':' + estudo.versiculoInicio + '-' + estudo.versiculoFim;
+        const href = 'layout_fixo.html?estudoId=' + encodeURIComponent(estudo.id);
+        return (
+          '<article class="study-item">' +
+            '<div class="study-meta">' +
+              '<p class="study-ref">' + ref + '</p>' +
+              '<p class="study-name">' + estudo.titulo + '</p>' +
+            '</div>' +
+            '<a class="study-open" href="' + href + '">Abrir</a>' +
+          '</article>'
+        );
+      }).join('');
     }
 
     function popularLivros() {
