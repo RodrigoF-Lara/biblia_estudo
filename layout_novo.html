@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Biblia Estudo | Layout Novo</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;600;700;800&display=swap');
+
+    :root {
+      --bg: #f2eee6;
+      --bg-soft: #f8f6f0;
+      --ink: #1d2a2a;
+      --muted: #5d6a6a;
+      --line: #d7ded8;
+      --accent: #126b5f;
+      --accent-dark: #0b5148;
+      --gold: #c49a3b;
+      --card: #ffffff;
+      --shadow: 0 16px 38px rgba(16, 46, 43, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Manrope', sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 5% 6%, rgba(196, 154, 59, 0.19), transparent 34%),
+        radial-gradient(circle at 95% 18%, rgba(18, 107, 95, 0.18), transparent 38%),
+        linear-gradient(180deg, #f4f0e8 0%, #efe9df 48%, #f7f4ed 100%);
+      min-height: 100vh;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(8px);
+      background: rgba(247, 244, 237, 0.9);
+      border-bottom: 1px solid #e2d9ca;
+    }
+
+    .topbar-inner {
+      width: min(1120px, calc(100% - 28px));
+      margin: 0 auto;
+      min-height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 0;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .brand strong {
+      font-family: 'Fraunces', serif;
+      font-size: 21px;
+      letter-spacing: 0.3px;
+      line-height: 1;
+    }
+
+    .brand span {
+      color: #45605f;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+      font-weight: 700;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn,
+    .ghost-btn,
+    .nav-btn {
+      height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.1px;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      padding: 0 14px;
+    }
+
+    .btn {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .btn:hover {
+      background: var(--accent-dark);
+      border-color: var(--accent-dark);
+    }
+
+    .ghost-btn {
+      background: rgba(18, 107, 95, 0.07);
+      border-color: rgba(18, 107, 95, 0.22);
+      color: var(--accent-dark);
+    }
+
+    .ghost-btn:hover {
+      background: rgba(18, 107, 95, 0.12);
+    }
+
+    .nav-btn {
+      width: 38px;
+      padding: 0;
+      background: #fff;
+      color: #23423f;
+      border-color: #d4ddd7;
+      font-size: 17px;
+      line-height: 1;
+    }
+
+    .nav-btn[aria-disabled="true"] {
+      opacity: 0.45;
+      pointer-events: none;
+    }
+
+    .site {
+      width: min(1120px, calc(100% - 28px));
+      margin: 24px auto 42px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid #d9d2c7;
+      border-radius: 22px;
+      background:
+        linear-gradient(120deg, #0e5f55 0%, #126b5f 52%, #1e7f72 100%);
+      color: #f6fbfa;
+      box-shadow: var(--shadow);
+      padding: clamp(22px, 3vw, 34px);
+      display: grid;
+      gap: 16px;
+      isolation: isolate;
+    }
+
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      border-radius: 999px;
+      opacity: 0.35;
+    }
+
+    .hero::before {
+      width: 280px;
+      height: 280px;
+      right: -88px;
+      top: -100px;
+      background: radial-gradient(circle, #f2cd7c 0%, transparent 68%);
+    }
+
+    .hero::after {
+      width: 340px;
+      height: 340px;
+      left: -120px;
+      bottom: -160px;
+      background: radial-gradient(circle, #0a3d36 0%, transparent 74%);
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 999px;
+      height: 34px;
+      padding: 0 12px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-family: 'Fraunces', serif;
+      font-size: clamp(32px, 4.6vw, 56px);
+      line-height: 1.05;
+      max-width: 880px;
+      letter-spacing: 0.2px;
+      text-wrap: balance;
+    }
+
+    .hero p {
+      margin: 0;
+      color: rgba(246, 251, 250, 0.9);
+      font-size: clamp(15px, 2.1vw, 18px);
+      max-width: 760px;
+      line-height: 1.5;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .pill {
+      border: 1px solid rgba(255, 255, 255, 0.36);
+      background: rgba(255, 255, 255, 0.14);
+      border-radius: 999px;
+      min-height: 32px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 12px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.1px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--card);
+      box-shadow: 0 10px 26px rgba(29, 42, 42, 0.08);
+      padding: clamp(16px, 2.6vw, 24px);
+      animation: rise 0.65s ease both;
+    }
+
+    .section-title {
+      margin: 0 0 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-family: 'Fraunces', serif;
+      font-size: clamp(23px, 3vw, 32px);
+      line-height: 1.13;
+      color: #173032;
+      letter-spacing: 0.15px;
+    }
+
+    .section-title span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 30px;
+      border-radius: 999px;
+      padding: 0 10px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      color: #0f4f47;
+      border: 1px solid #cfe0dc;
+      background: #f2f8f7;
+    }
+
+    .text-block {
+      margin: 0;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+      color: #273536;
+      font-size: 16px;
+      line-height: 1.67;
+    }
+
+    .scripture-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .translation {
+      border: 1px solid #d6dfdb;
+      border-radius: 14px;
+      padding: 14px;
+      background: #fcfdfb;
+      min-height: 220px;
+      display: grid;
+      align-content: start;
+      gap: 9px;
+      animation: rise 0.65s ease both;
+    }
+
+    .translation:nth-child(2) {
+      animation-delay: 0.07s;
+    }
+
+    .translation:nth-child(3) {
+      animation-delay: 0.14s;
+    }
+
+    .translation h3 {
+      margin: 0;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.85px;
+      color: #59716f;
+      font-weight: 800;
+    }
+
+    .translation p {
+      margin: 0;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+      color: #203130;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .gallery-wrap {
+      display: grid;
+      gap: 10px;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .gallery figure {
+      margin: 0;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid #d7ded8;
+      background: #eff5f3;
+      box-shadow: 0 7px 18px rgba(20, 48, 45, 0.1);
+    }
+
+    .gallery img {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      display: block;
+      background: linear-gradient(45deg, #dce8e5, #f5f9f8);
+    }
+
+    .gallery figcaption {
+      padding: 8px 10px;
+      font-size: 13px;
+      color: #3a4f4f;
+      border-top: 1px solid #d7ded8;
+      background: #fff;
+    }
+
+    .status {
+      border: 1px dashed #c9d5d0;
+      border-radius: 12px;
+      padding: 12px;
+      color: #4f6361;
+      background: #f8fbf9;
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .footer-note {
+      text-align: center;
+      color: #637271;
+      font-size: 13px;
+      margin: 4px 0 0;
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 980px) {
+      .scripture-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        width: 100%;
+      }
+
+      .topbar-inner {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .btn,
+      .ghost-btn,
+      .nav-btn {
+        min-height: 36px;
+        height: 36px;
+      }
+
+      .actions {
+        justify-content: flex-start;
+      }
+
+      .hero-meta {
+        gap: 6px;
+      }
+
+      .pill {
+        font-size: 12px;
+        min-height: 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <strong>Biblia Estudo</strong>
+        <span>Layout Novo</span>
+      </div>
+
+      <div class="actions">
+        <a class="nav-btn" id="prev-study-link" href="#" aria-disabled="true" title="Estudo anterior">&#8592;</a>
+        <a class="nav-btn" id="next-study-link" href="#" aria-disabled="true" title="Proximo estudo">&#8594;</a>
+        <a class="ghost-btn" id="switch-study-link" href="busca_estudo.html">Trocar estudo</a>
+        <a class="btn" id="switch-layout-link" href="layout_fixo.html">Ver layout classico</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="site">
+    <section class="hero">
+      <span class="hero-tag">Leitura e contemplacao</span>
+      <h1 id="hero-title">Carregando estudo...</h1>
+      <p id="hero-subtitle">Visualizacao alternativa com os mesmos dados dos arquivos markdown.</p>
+      <div class="hero-meta">
+        <span class="pill" id="pill-ref">Referencia: --</span>
+        <span class="pill" id="pill-layout">Modo: Novo</span>
+      </div>
+    </section>
+
+    <section class="card stack">
+      <div class="section-title">
+        <h2>Texto Biblico</h2>
+        <span>NVI | NAA | NLT</span>
+      </div>
+
+      <div class="scripture-grid">
+        <article class="translation">
+          <h3>NVI</h3>
+          <p id="nvi-content"></p>
+        </article>
+
+        <article class="translation">
+          <h3>NAA</h3>
+          <p id="naa-content"></p>
+        </article>
+
+        <article class="translation">
+          <h3>NLT (Ingles)</h3>
+          <p id="nlt-content"></p>
+        </article>
+      </div>
+    </section>
+
+    <section class="card stack">
+      <div class="section-title">
+        <h2>Estudo Biblico</h2>
+        <span>Conteudo Integral</span>
+      </div>
+      <p class="text-block" id="estudo-content"></p>
+      <a class="btn" id="additional-link" href="#" target="_blank" rel="noreferrer" hidden>Abrir estudo adicional</a>
+    </section>
+
+    <section class="card stack" id="images-card" hidden>
+      <div class="section-title">
+        <h2>Galeria de Apoio</h2>
+        <span>Imagens do Markdown</span>
+      </div>
+      <div class="gallery-wrap">
+        <div class="gallery" id="gallery"></div>
+      </div>
+    </section>
+
+    <section class="status" id="status">Carregando estudo...</section>
+    <p class="footer-note">Mesmo motor de dados do layout classico, com nova visualizacao.</p>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const requestedStudyId = params.get('estudoId');
+    const requestedMdPath = params.get('md');
+
+    let resolvedStudy = null;
+    let resolvedMdPath = requestedMdPath || 'Atos/At_1/1_5.md';
+    let resolvedImageDir = 'Atos/At_1/img';
+    let resolvedAdditionalUrl = '';
+    let studiesIndex = [];
+
+    function deriveImageDirFromMarkdownPath(markdownPath) {
+      const normalized = (markdownPath || '').replace(/\\/g, '/');
+      const parts = normalized.split('/');
+      parts.pop();
+      return (parts.join('/') || '.') + '/img';
+    }
+
+    function extractFirstUrl(text) {
+      const match = (text || '').match(/https?:\/\/[^\s)]+/i);
+      return match ? match[0] : '';
+    }
+
+    function parseMarkdownSections(md) {
+      const lines = md.replace(/\r/g, '').split('\n');
+      let title = 'Atos 1:1-5';
+      const sections = {};
+      let current = null;
+
+      for (const line of lines) {
+        const h1 = line.match(/^#\s+(.+)$/);
+        if (h1) {
+          title = h1[1].trim();
+          continue;
+        }
+
+        const h2 = line.match(/^##\s+(.+)$/);
+        if (h2) {
+          current = h2[1].trim().toLowerCase();
+          sections[current] = [];
+          continue;
+        }
+
+        if (current) {
+          sections[current].push(line);
+        }
+      }
+
+      const normalized = {};
+      for (const key of Object.keys(sections)) {
+        normalized[key] = sections[key].join('\n').trim();
+      }
+      return { title, sections: normalized };
+    }
+
+    function getSection(sections, names) {
+      for (const name of names) {
+        const key = name.toLowerCase();
+        if (sections[key]) {
+          return sections[key];
+        }
+      }
+      return '';
+    }
+
+    function extractImageList(imagesText) {
+      return imagesText
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.startsWith('- '))
+        .map(line => line.slice(2).trim())
+        .filter(item => item && !item.toLowerCase().includes('pasta recomendada'));
+    }
+
+    function normalizeStudyText(text) {
+      return (text || '')
+        .replace(/\r/g, '')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+    }
+
+    async function resolveStudyConfig() {
+      if (!requestedStudyId && !requestedMdPath) {
+        resolvedImageDir = deriveImageDirFromMarkdownPath(resolvedMdPath);
+        return;
+      }
+
+      if (requestedStudyId) {
+        const response = await fetch('estudos_index.json');
+        if (!response.ok) {
+          throw new Error('Falha ao carregar estudos_index.json');
+        }
+
+        const index = await response.json();
+        const estudos = Array.isArray(index.estudos) ? index.estudos : [];
+        studiesIndex = estudos;
+        const found = estudos.find(item => item.id === requestedStudyId);
+
+        if (!found) {
+          throw new Error('Estudo nao encontrado no indice');
+        }
+
+        resolvedStudy = found;
+        resolvedMdPath = found.markdownPath;
+        resolvedImageDir = found.imageDir || deriveImageDirFromMarkdownPath(found.markdownPath);
+        resolvedAdditionalUrl = found.additionalStudyUrl || '';
+        return;
+      }
+
+      resolvedImageDir = deriveImageDirFromMarkdownPath(resolvedMdPath);
+    }
+
+    function buildQueryForStudy(studyId, mdPath) {
+      if (studyId) {
+        return 'estudoId=' + encodeURIComponent(studyId);
+      }
+      return 'md=' + encodeURIComponent(mdPath || resolvedMdPath);
+    }
+
+    function updatePrevNextLinks() {
+      const prevLink = document.getElementById('prev-study-link');
+      const nextLink = document.getElementById('next-study-link');
+
+      if (!prevLink || !nextLink) {
+        return;
+      }
+
+      const disable = (el) => {
+        el.href = '#';
+        el.setAttribute('aria-disabled', 'true');
+      };
+
+      const enable = (el, id) => {
+        el.href = 'layout_novo.html?estudoId=' + encodeURIComponent(id);
+        el.setAttribute('aria-disabled', 'false');
+      };
+
+      if (!resolvedStudy || !studiesIndex.length) {
+        disable(prevLink);
+        disable(nextLink);
+        return;
+      }
+
+      const currentIndex = studiesIndex.findIndex(item => item.id === resolvedStudy.id);
+      if (currentIndex < 0) {
+        disable(prevLink);
+        disable(nextLink);
+        return;
+      }
+
+      const prev = studiesIndex[currentIndex - 1];
+      const next = studiesIndex[currentIndex + 1];
+
+      if (prev && prev.id) {
+        enable(prevLink, prev.id);
+      } else {
+        disable(prevLink);
+      }
+
+      if (next && next.id) {
+        enable(nextLink, next.id);
+      } else {
+        disable(nextLink);
+      }
+    }
+
+    function updateCrossLinks() {
+      const switchLayout = document.getElementById('switch-layout-link');
+      const switchStudy = document.getElementById('switch-study-link');
+      const query = buildQueryForStudy(resolvedStudy ? resolvedStudy.id : '', resolvedMdPath);
+
+      switchLayout.href = 'layout_fixo.html?' + query;
+
+      if (resolvedStudy) {
+        switchStudy.href =
+          'busca_estudo.html?livro=' + encodeURIComponent(resolvedStudy.livro) +
+          '&capitulo=' + encodeURIComponent(String(resolvedStudy.capitulo)) +
+          '&versiculo=' + encodeURIComponent(String(resolvedStudy.versiculoInicio)) +
+          '&layout=novo';
+      } else {
+        switchStudy.href = 'busca_estudo.html?layout=novo';
+      }
+    }
+
+    function renderImages(title, names) {
+      const card = document.getElementById('images-card');
+      const gallery = document.getElementById('gallery');
+
+      if (!names.length) {
+        card.hidden = true;
+        gallery.innerHTML = '';
+        return;
+      }
+
+      const html = names.map((name, index) => {
+        const path = resolvedImageDir + '/' + encodeURIComponent(name);
+        const caption = title + ' | Imagem ' + (index + 1);
+        return (
+          '<figure>' +
+            '<img src="' + path + '" alt="' + caption + '">' +
+            '<figcaption>' + caption + '</figcaption>' +
+          '</figure>'
+        );
+      }).join('');
+
+      gallery.innerHTML = html;
+      card.hidden = false;
+    }
+
+    function setStatus(message, isError) {
+      const el = document.getElementById('status');
+      el.textContent = message;
+      el.style.borderColor = isError ? '#d7b9b9' : '#c9d5d0';
+      el.style.background = isError ? '#fff7f7' : '#f8fbf9';
+      el.style.color = isError ? '#7b3f3f' : '#4f6361';
+    }
+
+    async function renderFromMarkdown() {
+      try {
+        await resolveStudyConfig();
+
+        const response = await fetch(resolvedMdPath);
+        if (!response.ok) {
+          throw new Error('Falha ao ler o markdown');
+        }
+
+        const md = await response.text();
+        const { title, sections } = parseMarkdownSections(md);
+
+        const nvi = getSection(sections, ['nvi']);
+        const naa = getSection(sections, ['naa']);
+        const nlt = getSection(sections, ['nlt (ingles)', 'nlt', 'ntl (ingles)', 'ntl']);
+        const estudoCompleto = normalizeStudyText(getSection(sections, ['estudo biblico', 'estudo ia']));
+        const imagesSection = getSection(sections, ['imagens']);
+        const imageNames = extractImageList(imagesSection);
+
+        const mdAdditionalUrl = extractFirstUrl(getSection(sections, ['estudos adicionais', 'link estudos adicionais', 'estudo adicional']));
+        const finalAdditionalUrl = mdAdditionalUrl || resolvedAdditionalUrl;
+
+        document.title = title + ' | Biblia Estudo | Layout Novo';
+        document.getElementById('hero-title').textContent = title;
+
+        if (resolvedStudy) {
+          document.getElementById('hero-subtitle').textContent =
+            'Leitura estruturada de ' + resolvedStudy.livro + ' ' + resolvedStudy.capitulo + ':' + resolvedStudy.versiculoInicio + '-' + resolvedStudy.versiculoFim + ' com visualizacao alternativa.';
+          document.getElementById('pill-ref').textContent =
+            'Referencia: ' + resolvedStudy.livro + ' ' + resolvedStudy.capitulo + ':' + resolvedStudy.versiculoInicio + '-' + resolvedStudy.versiculoFim;
+        } else {
+          document.getElementById('hero-subtitle').textContent = 'Leitura estruturada carregada diretamente por caminho markdown.';
+          document.getElementById('pill-ref').textContent = 'Referencia: ' + title;
+        }
+
+        document.getElementById('nvi-content').textContent = nvi || 'Sem conteudo NVI neste estudo.';
+        document.getElementById('naa-content').textContent = naa || 'Sem conteudo NAA neste estudo.';
+        document.getElementById('nlt-content').textContent = nlt || 'Sem conteudo NLT neste estudo.';
+        document.getElementById('estudo-content').textContent = estudoCompleto || 'Sem secao de estudo biblico neste markdown.';
+
+        const additionalLink = document.getElementById('additional-link');
+        if (finalAdditionalUrl) {
+          additionalLink.href = finalAdditionalUrl;
+          additionalLink.hidden = false;
+        } else {
+          additionalLink.hidden = true;
+        }
+
+        renderImages(title, imageNames);
+        updatePrevNextLinks();
+        updateCrossLinks();
+        setStatus('Estudo carregado com sucesso a partir de ' + resolvedMdPath + '.', false);
+      } catch (error) {
+        setStatus('Erro ao carregar estudo: ' + error.message + '. Abra via servidor local no VS Code.', true);
+      }
+    }
+
+    renderFromMarkdown();
+  </script>
+</body>
+</html>
