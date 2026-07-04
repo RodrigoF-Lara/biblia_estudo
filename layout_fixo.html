@@ -627,7 +627,7 @@
       <header class="header" id="header-right">
         <div class="header-row">
           <div class="header-main">
-            <h1>Painel De Imagens</h1>
+            <h1 id="titulo-direito">Atos 1:1-5</h1>
             <p>Leitura visual do trecho para contemplacao, memoria e ensino</p>
           </div>
 
@@ -1000,6 +1000,7 @@
         }
 
         document.getElementById('titulo-principal').textContent = title;
+        document.getElementById('titulo-direito').textContent = title;
         if (resolvedStudy) {
           document.querySelector('#header-left p').textContent = 'Painel de estudo | ' + resolvedStudy.livro + ' ' + resolvedStudy.capitulo + ':' + resolvedStudy.versiculoInicio + '-' + resolvedStudy.versiculoFim + ' | NVI, NAA, NLT e Estudo Biblico';
           document.getElementById('switch-study-link').href =
