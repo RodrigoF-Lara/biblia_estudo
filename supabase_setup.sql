@@ -95,6 +95,22 @@ create trigger on_auth_user_created
 after insert on auth.users
 for each row execute function public.handle_new_user();
 
+-- Backfill para usuarios criados antes do trigger existir.
+insert into public.profiles (id)
+select u.id
+from auth.users u
+on conflict (id) do nothing;
+
+insert into public.user_marketing_consent (user_id)
+select u.id
+from auth.users u
+on conflict (user_id) do nothing;
+
+insert into public.user_private_data (user_id)
+select u.id
+from auth.users u
+on conflict (user_id) do nothing;
+
 alter table public.profiles enable row level security;
 alter table public.user_marketing_consent enable row level security;
 alter table public.admin_users enable row level security;
@@ -174,6 +190,19 @@ using (
     where a.user_id = auth.uid()
   )
 )
+with check (
+  auth.uid() = user_id
+  or exists (
+    select 1
+    from public.admin_users a
+    where a.user_id = auth.uid()
+  )
+);
+
+drop policy if exists "consent_insert_own_or_admin" on public.user_marketing_consent;
+create policy "consent_insert_own_or_admin"
+on public.user_marketing_consent
+for insert
 with check (
   auth.uid() = user_id
   or exists (

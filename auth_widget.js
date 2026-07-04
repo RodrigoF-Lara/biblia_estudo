@@ -1,6 +1,7 @@
 (function () {
   const config = window.BIBLIA_SUPABASE_CONFIG || {};
   const hasConfig = Boolean(config.url && config.anonKey);
+  const widgetStateKey = 'bibliaAuthWidgetOpen';
   let currentUserId = '';
   let acceptedTermsAt = null;
   let acceptedPrivacyAt = null;
@@ -9,6 +10,14 @@
     const style = document.createElement('style');
     style.textContent = [
       '.auth-widget{position:fixed;right:16px;bottom:16px;z-index:9999;width:min(390px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto;background:#fff;border:1px solid #d8dfda;border-radius:14px;box-shadow:0 12px 32px rgba(11,41,39,0.18);padding:12px 12px 10px;font-family:Arial,sans-serif;color:#1f2b2b}',
+      '.auth-widget.auth-collapsed{width:auto;max-height:none;overflow:visible;background:transparent;border:none;box-shadow:none;padding:0}',
+      '.auth-fab{height:40px;border:1px solid #126b5f;background:#126b5f;color:#fff;border-radius:999px;padding:0 14px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 10px 24px rgba(11,41,39,0.28)}',
+      '.auth-fab:hover{background:#0f5c52;border-color:#0f5c52}',
+      '.auth-widget.auth-open .auth-fab{display:none}',
+      '.auth-widget.auth-collapsed .auth-panel{display:none}',
+      '.auth-panel-head{display:flex;align-items:center;justify-content:space-between;gap:8px}',
+      '.auth-close{height:28px;min-width:28px;border:1px solid #bfd2cd;background:#f7fbfa;color:#1f4d48;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;line-height:1}',
+      '.auth-close:hover{background:#edf6f4}',
       '.auth-widget *{box-sizing:border-box}',
       '.auth-title{margin:0 0 8px;font-size:14px;font-weight:700;color:#173a37}',
       '.auth-row{display:flex;gap:8px;align-items:center}',
@@ -40,9 +49,14 @@
 
   function createWidget() {
     const wrap = document.createElement('aside');
-    wrap.className = 'auth-widget';
+    wrap.className = 'auth-widget auth-collapsed';
     wrap.innerHTML = [
-      '<p class="auth-title">Conta</p>',
+      '<button class="auth-fab" id="auth-fab" type="button">Conta</button>',
+      '<div class="auth-panel">',
+      '<div class="auth-panel-head">',
+      '  <p class="auth-title">Conta</p>',
+      '  <button class="auth-close" id="auth-close" type="button" aria-label="Fechar painel">x</button>',
+      '</div>',
       '<div class="auth-logged-out">',
       '  <div class="auth-row">',
       '    <input class="auth-input" id="auth-email" type="email" placeholder="Seu email" autocomplete="email"/>',
@@ -96,7 +110,8 @@
       '    <button class="auth-btn" id="auth-save-profile" type="submit">Salvar perfil</button>',
       '  </form>',
       '</div>',
-      '<p class="auth-status" id="auth-status"></p>'
+      '<p class="auth-status" id="auth-status"></p>',
+      '</div>'
     ].join('');
     document.body.appendChild(wrap);
     return wrap;
@@ -121,6 +136,8 @@
   }
 
   function boot(client, widget) {
+    const fabBtn = widget.querySelector('#auth-fab');
+    const closeBtn = widget.querySelector('#auth-close');
     const loggedOut = widget.querySelector('.auth-logged-out');
     const loggedIn = widget.querySelector('.auth-logged-in');
     const emailInput = widget.querySelector('#auth-email');
@@ -145,6 +162,28 @@
       terms: widget.querySelector('#profile-terms'),
       privacy: widget.querySelector('#profile-privacy')
     };
+
+    function setWidgetOpen(isOpen) {
+      if (isOpen) {
+        widget.classList.add('auth-open');
+        widget.classList.remove('auth-collapsed');
+      } else {
+        widget.classList.remove('auth-open');
+        widget.classList.add('auth-collapsed');
+      }
+      localStorage.setItem(widgetStateKey, isOpen ? '1' : '0');
+    }
+
+    const initialOpen = localStorage.getItem(widgetStateKey) === '1';
+    setWidgetOpen(initialOpen);
+
+    fabBtn.addEventListener('click', function () {
+      setWidgetOpen(true);
+    });
+
+    closeBtn.addEventListener('click', function () {
+      setWidgetOpen(false);
+    });
 
     async function loadProfile(userId) {
       currentUserId = userId;
@@ -358,6 +397,7 @@
           throw result.error;
         }
 
+        setWidgetOpen(true);
         setStatus(statusEl, 'Link enviado. Abra seu email e clique para entrar.', 'ok');
       } catch (err) {
         setStatus(statusEl, 'Falha ao enviar link: ' + (err.message || 'erro desconhecido'), 'error');
@@ -397,11 +437,15 @@
 
     if (!window.supabase || !window.supabase.createClient) {
       setStatus(statusEl, 'SDK do Supabase nao foi carregado.', 'error');
+      widget.classList.add('auth-open');
+      widget.classList.remove('auth-collapsed');
       return;
     }
 
     if (!hasConfig) {
       setStatus(statusEl, 'Configure supabase-config.js para ativar o login.', 'error');
+      widget.classList.add('auth-open');
+      widget.classList.remove('auth-collapsed');
       return;
     }
 

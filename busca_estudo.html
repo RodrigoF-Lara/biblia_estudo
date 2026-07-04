@@ -56,7 +56,7 @@
 
     form {
       display: grid;
-      grid-template-columns: 1.3fr 1fr 1fr 1fr auto;
+      grid-template-columns: 1.3fr 1fr 1fr auto;
       gap: 10px;
       align-items: end;
     }
@@ -191,7 +191,7 @@
 <body>
   <main class="panel">
     <h1>Busca De Estudos Biblicos</h1>
-    <p class="subtitle">Escolha livro, capitulo, versiculo e o visual que deseja abrir.</p>
+    <p class="subtitle">Escolha livro, capitulo e versiculo para abrir o estudo.</p>
 
     <form id="form-busca">
       <label>
@@ -207,14 +207,6 @@
       <label>
         Versiculo
         <input id="versiculo" type="number" min="1" step="1" required />
-      </label>
-
-      <label>
-        Layout
-        <select id="layout" required>
-          <option value="classico">Classico</option>
-          <option value="novo">Novo</option>
-        </select>
       </label>
 
       <button type="submit">Abrir Estudo</button>
@@ -234,22 +226,9 @@
   <script>
     let estudos = [];
     const params = new URLSearchParams(window.location.search);
-    const savedLayout = localStorage.getItem('layoutPreferido') || 'classico';
-
-    function getLayoutSelecionado() {
-      const el = document.getElementById('layout');
-      if (!el) {
-        return 'classico';
-      }
-      return el.value === 'novo' ? 'novo' : 'classico';
-    }
-
-    function getLayoutPage(layout) {
-      return layout === 'novo' ? 'layout_novo.html' : 'layout_fixo.html';
-    }
 
     function buildStudyHref(estudo) {
-      const page = getLayoutPage(getLayoutSelecionado());
+      const page = 'layout_novo.html';
       return page + '?estudoId=' + encodeURIComponent(estudo.id);
     }
 
@@ -310,8 +289,6 @@
       const livroParam = params.get('livro');
       const capituloParam = params.get('capitulo');
       const versiculoParam = params.get('versiculo');
-      const layoutParam = params.get('layout');
-
       if (livroParam && livros.includes(livroParam)) {
         select.value = livroParam;
       }
@@ -321,13 +298,6 @@
       if (versiculoParam) {
         document.getElementById('versiculo').value = versiculoParam;
       }
-
-      const layoutSelect = document.getElementById('layout');
-      const finalLayout = layoutParam === 'novo' || layoutParam === 'classico'
-        ? layoutParam
-        : savedLayout;
-      layoutSelect.value = finalLayout;
-      localStorage.setItem('layoutPreferido', finalLayout);
     }
 
     function buscarEstudo(livro, capitulo, versiculo) {
@@ -367,8 +337,6 @@
       const livro = document.getElementById('livro').value;
       const capitulo = Number(document.getElementById('capitulo').value);
       const versiculo = Number(document.getElementById('versiculo').value);
-      const layout = getLayoutSelecionado();
-      localStorage.setItem('layoutPreferido', layout);
 
       const estudo = buscarEstudo(livro, capitulo, versiculo);
       if (!estudo) {
@@ -379,11 +347,6 @@
       const resultado = document.getElementById('resultado');
       resultado.innerHTML = 'Abrindo <strong>' + estudo.titulo + '</strong>...';
       window.location.href = buildStudyHref(estudo);
-    });
-
-    document.getElementById('layout').addEventListener('change', () => {
-      localStorage.setItem('layoutPreferido', getLayoutSelecionado());
-      renderListaEstudos();
     });
 
     carregarIndice().catch(err => {

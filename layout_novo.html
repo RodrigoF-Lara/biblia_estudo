@@ -454,7 +454,6 @@
         <a class="nav-btn" id="prev-study-link" href="#" aria-disabled="true" title="Estudo anterior">&#8592;</a>
         <a class="nav-btn" id="next-study-link" href="#" aria-disabled="true" title="Proximo estudo">&#8594;</a>
         <a class="ghost-btn" id="switch-study-link" href="busca_estudo.html">Trocar estudo</a>
-        <a class="btn" id="switch-layout-link" href="layout_fixo.html">Ver layout classico</a>
       </div>
     </div>
   </header>
@@ -514,7 +513,7 @@
     </section>
 
     <section class="status" id="status">Carregando estudo...</section>
-    <p class="footer-note">Mesmo motor de dados do layout classico, com nova visualizacao.</p>
+    <p class="footer-note">Visual oficial do projeto com leitura a partir dos mesmos arquivos markdown.</p>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -633,13 +632,6 @@
       resolvedImageDir = deriveImageDirFromMarkdownPath(resolvedMdPath);
     }
 
-    function buildQueryForStudy(studyId, mdPath) {
-      if (studyId) {
-        return 'estudoId=' + encodeURIComponent(studyId);
-      }
-      return 'md=' + encodeURIComponent(mdPath || resolvedMdPath);
-    }
-
     function updatePrevNextLinks() {
       const prevLink = document.getElementById('prev-study-link');
       const nextLink = document.getElementById('next-study-link');
@@ -688,20 +680,15 @@
     }
 
     function updateCrossLinks() {
-      const switchLayout = document.getElementById('switch-layout-link');
       const switchStudy = document.getElementById('switch-study-link');
-      const query = buildQueryForStudy(resolvedStudy ? resolvedStudy.id : '', resolvedMdPath);
-
-      switchLayout.href = 'layout_fixo.html?' + query;
 
       if (resolvedStudy) {
         switchStudy.href =
           'busca_estudo.html?livro=' + encodeURIComponent(resolvedStudy.livro) +
           '&capitulo=' + encodeURIComponent(String(resolvedStudy.capitulo)) +
-          '&versiculo=' + encodeURIComponent(String(resolvedStudy.versiculoInicio)) +
-          '&layout=novo';
+          '&versiculo=' + encodeURIComponent(String(resolvedStudy.versiculoInicio));
       } else {
-        switchStudy.href = 'busca_estudo.html?layout=novo';
+        switchStudy.href = 'busca_estudo.html';
       }
     }
 
