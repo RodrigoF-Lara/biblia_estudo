@@ -35,6 +35,7 @@ No painel: SQL Editor
 3. Se voce ja tinha executado antes, execute novamente a versao atual. Isso cria/atualiza:
    - campo bairro e campo cpf (completo) em user_private_data
    - bucket de fotos "avatars" (Storage) com politicas RLS por usuario
+   - tabela study_completions (progresso de estudos: estrela de concluido)
 
 ## 4) Tornar seu usuario admin
 Depois do seu primeiro login: 

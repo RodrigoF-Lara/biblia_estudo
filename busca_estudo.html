@@ -188,6 +188,37 @@
       background: rgba(255, 255, 255, 0.55);
     }
 
+    .study-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .star-btn {
+      width: 38px;
+      height: 38px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+      color: #c9b48a;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .star-btn.done {
+      color: #e0a92b;
+      border-color: #e0a92b;
+      background: #fff7e6;
+    }
+
+    .star-btn:hover { filter: brightness(1.03); }
+
+    .section-count { font-weight: 400; color: #9a8c7c; }
+
     @media (max-width: 860px) {
       form { grid-template-columns: 1fr; }
       button { width: 100%; }
@@ -221,8 +252,13 @@
     <div class="result" id="resultado"></div>
     <p class="hint">Regra: se voce buscar, por exemplo, versiculo 3 e existir um estudo 1-5, o sistema abre esse estudo.</p>
 
-    <h2 class="studies-title">Estudos Disponiveis</h2>
-    <section class="studies-list" id="lista-estudos"></section>
+    <p class="hint" id="progress-hint">Entre na sua conta (menu no topo) para marcar estudos como concluidos.</p>
+
+    <h2 class="studies-title">Estudos Pendentes <span class="section-count" id="count-pendentes"></span></h2>
+    <section class="studies-list" id="lista-pendentes"></section>
+
+    <h2 class="studies-title">Estudos Realizados <span class="section-count" id="count-realizados"></span></h2>
+    <section class="studies-list" id="lista-realizados"></section>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -231,7 +267,14 @@
 
   <script>
     let estudos = [];
+    let currentUser = null;
+    let completedSet = new Set();
     const params = new URLSearchParams(window.location.search);
+
+    const supaConfig = window.BIBLIA_SUPABASE_CONFIG || {};
+    const supaClient = (window.supabase && supaConfig.url && supaConfig.anonKey)
+      ? window.supabase.createClient(supaConfig.url, supaConfig.anonKey)
+      : null;
 
     function buildStudyHref(estudo) {
       const page = 'layout_novo.html';
@@ -246,45 +289,119 @@
       const data = await res.json();
       estudos = Array.isArray(data.estudos) ? data.estudos : [];
       popularLivros();
+      await refreshCompletions();
       renderListaEstudos();
     }
 
-    function renderListaEstudos() {
-      const listEl = document.getElementById('lista-estudos');
-      if (!listEl) {
+    async function refreshCompletions() {
+      completedSet = new Set();
+      if (!supaClient || !currentUser) {
         return;
+      }
+      try {
+        const res = await supaClient.from('study_completions').select('study_id').eq('user_id', currentUser.id);
+        if (res.error) throw res.error;
+        (res.data || []).forEach(function (row) { completedSet.add(row.study_id); });
+      } catch (err) {
+        // silencioso: mantem lista de concluidos vazia
+      }
+    }
+
+    function ordenarEstudos(lista) {
+      return [...lista].sort((a, b) => {
+        const livroComp = String(a.livro).localeCompare(String(b.livro), 'pt-BR');
+        if (livroComp !== 0) return livroComp;
+        const capComp = Number(a.capitulo) - Number(b.capitulo);
+        if (capComp !== 0) return capComp;
+        return Number(a.versiculoInicio) - Number(b.versiculoInicio);
+      });
+    }
+
+    function studyItemHtml(estudo, done) {
+      const ref = estudo.livro + ' ' + estudo.capitulo + ':' + estudo.versiculoInicio + '-' + estudo.versiculoFim;
+      const href = buildStudyHref(estudo);
+      const starTitle = currentUser
+        ? (done ? 'Desmarcar como concluido' : 'Marcar como concluido')
+        : 'Entre para marcar';
+      return (
+        '<article class="study-item">' +
+          '<div class="study-meta">' +
+            '<p class="study-ref">' + ref + '</p>' +
+            '<p class="study-name">' + estudo.titulo + '</p>' +
+          '</div>' +
+          '<div class="study-actions">' +
+            '<button type="button" class="star-btn' + (done ? ' done' : '') + '" data-id="' + estudo.id + '" title="' + starTitle + '" aria-label="' + starTitle + '">' + (done ? '\u2605' : '\u2606') + '</button>' +
+            '<a class="study-open" href="' + href + '">Abrir</a>' +
+          '</div>' +
+        '</article>'
+      );
+    }
+
+    function renderListaEstudos() {
+      const pendEl = document.getElementById('lista-pendentes');
+      const doneEl = document.getElementById('lista-realizados');
+      const countPend = document.getElementById('count-pendentes');
+      const countDone = document.getElementById('count-realizados');
+      const hint = document.getElementById('progress-hint');
+      if (!pendEl || !doneEl) {
+        return;
+      }
+
+      if (hint) {
+        hint.style.display = currentUser ? 'none' : 'block';
       }
 
       if (!estudos.length) {
-        listEl.innerHTML = '<div class="studies-empty">Nenhum estudo cadastrado ainda.</div>';
+        pendEl.innerHTML = '<div class="studies-empty">Nenhum estudo cadastrado ainda.</div>';
+        doneEl.innerHTML = '';
+        if (countPend) countPend.textContent = '';
+        if (countDone) countDone.textContent = '';
         return;
       }
 
-      const ordenados = [...estudos].sort((a, b) => {
-        const livroComp = String(a.livro).localeCompare(String(b.livro), 'pt-BR');
-        if (livroComp !== 0) {
-          return livroComp;
-        }
-        const capComp = Number(a.capitulo) - Number(b.capitulo);
-        if (capComp !== 0) {
-          return capComp;
-        }
-        return Number(a.versiculoInicio) - Number(b.versiculoInicio);
-      });
+      const ordenados = ordenarEstudos(estudos);
+      const pendentes = ordenados.filter(function (e) { return !completedSet.has(e.id); });
+      const realizados = ordenados.filter(function (e) { return completedSet.has(e.id); });
 
-      listEl.innerHTML = ordenados.map(estudo => {
-        const ref = estudo.livro + ' ' + estudo.capitulo + ':' + estudo.versiculoInicio + '-' + estudo.versiculoFim;
-        const href = buildStudyHref(estudo);
-        return (
-          '<article class="study-item">' +
-            '<div class="study-meta">' +
-              '<p class="study-ref">' + ref + '</p>' +
-              '<p class="study-name">' + estudo.titulo + '</p>' +
-            '</div>' +
-            '<a class="study-open" href="' + href + '">Abrir</a>' +
-          '</article>'
-        );
-      }).join('');
+      pendEl.innerHTML = pendentes.length
+        ? pendentes.map(function (e) { return studyItemHtml(e, false); }).join('')
+        : '<div class="studies-empty">Nenhum estudo pendente.</div>';
+
+      doneEl.innerHTML = realizados.length
+        ? realizados.map(function (e) { return studyItemHtml(e, true); }).join('')
+        : '<div class="studies-empty">Nenhum estudo concluido ainda.</div>';
+
+      if (countPend) countPend.textContent = '(' + pendentes.length + ')';
+      if (countDone) countDone.textContent = '(' + realizados.length + ')';
+
+      [pendEl, doneEl].forEach(function (container) {
+        container.querySelectorAll('.star-btn').forEach(function (btn) {
+          btn.addEventListener('click', function () { toggleCompletion(btn.getAttribute('data-id')); });
+        });
+      });
+    }
+
+    async function toggleCompletion(studyId) {
+      const resultado = document.getElementById('resultado');
+      if (!supaClient || !currentUser) {
+        if (resultado) resultado.innerHTML = 'Entre na sua conta (menu no topo) para marcar estudos como concluidos.';
+        return;
+      }
+      const isDone = completedSet.has(studyId);
+      try {
+        if (isDone) {
+          const del = await supaClient.from('study_completions').delete().eq('user_id', currentUser.id).eq('study_id', studyId);
+          if (del.error) throw del.error;
+          completedSet.delete(studyId);
+        } else {
+          const ins = await supaClient.from('study_completions').upsert({ user_id: currentUser.id, study_id: studyId }, { onConflict: 'user_id,study_id' });
+          if (ins.error) throw ins.error;
+          completedSet.add(studyId);
+        }
+        renderListaEstudos();
+      } catch (err) {
+        if (resultado) resultado.textContent = 'Falha ao atualizar progresso: ' + (err.message || 'erro desconhecido');
+      }
     }
 
     function popularLivros() {
@@ -355,7 +472,26 @@
       window.location.href = buildStudyHref(estudo);
     });
 
-    carregarIndice().catch(err => {
+    async function initAuthAndLoad() {
+      if (supaClient) {
+        try {
+          const sess = await supaClient.auth.getSession();
+          currentUser = (sess && sess.data && sess.data.session) ? sess.data.session.user : null;
+        } catch (e) {
+          currentUser = null;
+        }
+
+        supaClient.auth.onAuthStateChange(async function (_event, session) {
+          currentUser = session ? session.user : null;
+          await refreshCompletions();
+          renderListaEstudos();
+        });
+      }
+
+      await carregarIndice();
+    }
+
+    initAuthAndLoad().catch(err => {
       document.getElementById('resultado').textContent = err.message;
     });
   </script>

@@ -272,6 +272,41 @@ using (auth.uid() = user_id);
 comment on table public.admin_users is 'Lista de usuarios administradores. Inserir manualmente no SQL Editor ou backend com service role.';
 comment on table public.user_private_data is 'Dados sensiveis por usuario. CPF completo + finais.';
 
+-- Progresso de estudos por usuario (estrela de concluido)
+create table if not exists public.study_completions (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  study_id text not null,
+  completed_at timestamptz not null default now(),
+  primary key (user_id, study_id)
+);
+
+alter table public.study_completions enable row level security;
+
+drop policy if exists "study_completions_select_own_or_admin" on public.study_completions;
+create policy "study_completions_select_own_or_admin"
+on public.study_completions
+for select
+using (
+  auth.uid() = user_id
+  or exists (
+    select 1
+    from public.admin_users a
+    where a.user_id = auth.uid()
+  )
+);
+
+drop policy if exists "study_completions_insert_own" on public.study_completions;
+create policy "study_completions_insert_own"
+on public.study_completions
+for insert
+with check (auth.uid() = user_id);
+
+drop policy if exists "study_completions_delete_own" on public.study_completions;
+create policy "study_completions_delete_own"
+on public.study_completions
+for delete
+using (auth.uid() = user_id);
+
 -- Storage: bucket de fotos de perfil (avatars)
 insert into storage.buckets (id, name, public)
 values ('avatars', 'avatars', true)
