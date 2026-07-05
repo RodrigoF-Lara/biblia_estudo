@@ -315,12 +315,33 @@ create table if not exists public.study_comments (
   entry_type text not null default 'comment' check (entry_type in ('comment', 'prayer')),
   content text,
   audio_url text,
+  author_name text,
+  author_avatar_url text,
   created_at timestamptz not null default now(),
   constraint study_comments_content_or_audio check (
     nullif(trim(coalesce(content, '')), '') is not null
     or audio_url is not null
   )
 );
+
+alter table public.study_comments
+  add column if not exists author_name text;
+
+alter table public.study_comments
+  add column if not exists author_avatar_url text;
+
+update public.study_comments sc
+set
+  author_name = coalesce(nullif(trim(sc.author_name), ''), p.full_name, split_part(u.email, '@', 1), 'Usuario'),
+  author_avatar_url = coalesce(sc.author_avatar_url, p.avatar_url)
+from auth.users u
+left join public.profiles p on p.id = u.id
+where u.id = sc.user_id
+  and (
+    sc.author_name is null
+    or trim(sc.author_name) = ''
+    or sc.author_avatar_url is null
+  );
 
 create index if not exists study_comments_study_created_idx
   on public.study_comments (study_id, created_at desc);
@@ -425,6 +446,10 @@ using (
 insert into storage.buckets (id, name, public)
 values ('study-audio', 'study-audio', true)
 on conflict (id) do nothing;
+
+update storage.buckets
+set public = true
+where id = 'study-audio';
 
 drop policy if exists "study_audio_public_read" on storage.objects;
 create policy "study_audio_public_read"

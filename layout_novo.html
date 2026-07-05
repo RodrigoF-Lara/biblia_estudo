@@ -826,6 +826,7 @@
     let recordedAudioObjectUrl = '';
     let recordingTimerId = null;
     let recordingStartedAt = 0;
+    let authorSnapshot = { name: '', avatarUrl: '' };
 
     function deriveImageDirFromMarkdownPath(markdownPath) {
       const normalized = (markdownPath || '').replace(/\\/g, '/');
@@ -1136,6 +1137,33 @@
       }
     }
 
+    function normalizePublicAuthorName(value) {
+      const clean = String(value || '').trim();
+      if (clean) return clean;
+      if (currentSessionUser && currentSessionUser.email) {
+        return currentSessionUser.email.split('@')[0] || 'Usuario';
+      }
+      return 'Usuario';
+    }
+
+    async function refreshAuthorSnapshot() {
+      if (!supabaseClient || !currentSessionUser) {
+        authorSnapshot = { name: '', avatarUrl: '' };
+        return;
+      }
+
+      const { data } = await supabaseClient
+        .from('profiles')
+        .select('full_name, avatar_url')
+        .eq('id', currentSessionUser.id)
+        .maybeSingle();
+
+      authorSnapshot = {
+        name: normalizePublicAuthorName(data && data.full_name),
+        avatarUrl: (data && data.avatar_url) || ''
+      };
+    }
+
     async function fetchProfileMap(userIds) {
       const map = {};
       if (!supabaseClient || !userIds.length) {
@@ -1162,8 +1190,8 @@
 
       const html = items.map(function (item) {
         const profile = profileMap[item.user_id] || {};
-        const author = profile.full_name || 'Usuario';
-        const avatarUrl = profile.avatar_url || '';
+        const author = item.author_name || profile.full_name || 'Usuario';
+        const avatarUrl = item.author_avatar_url || profile.avatar_url || '';
         const initials = getInitials(author);
         const dateLabel = formatDateTimeBR(item.created_at);
         const typeLabel = item.entry_type === 'prayer' ? 'Oracao' : 'Comentario';
@@ -1206,7 +1234,7 @@
 
       const { data, error } = await supabaseClient
         .from('study_comments')
-        .select('id, study_id, user_id, entry_type, content, audio_url, created_at')
+        .select('id, study_id, user_id, entry_type, content, audio_url, author_name, author_avatar_url, created_at')
         .eq('study_id', studyPublicId)
         .order('created_at', { ascending: false })
         .limit(200);
@@ -1217,7 +1245,12 @@
       }
 
       const items = data || [];
-      const userIds = Array.from(new Set(items.map(function (item) { return item.user_id; }).filter(Boolean)));
+      const userIds = Array.from(new Set(
+        items
+          .filter(function (item) { return !item.author_name || !item.author_avatar_url; })
+          .map(function (item) { return item.user_id; })
+          .filter(Boolean)
+      ));
       const profileMap = await fetchProfileMap(userIds);
       renderCommunityItems(items, profileMap);
     }
@@ -1279,7 +1312,9 @@
           user_id: currentSessionUser.id,
           entry_type: entryType,
           content: content || null,
-          audio_url: audioUrl || null
+          audio_url: audioUrl || null,
+          author_name: normalizePublicAuthorName(authorSnapshot.name),
+          author_avatar_url: authorSnapshot.avatarUrl || null
         };
 
         const { error } = await supabaseClient.from('study_comments').insert(payload);
@@ -1382,9 +1417,11 @@
       if (supabaseClient) {
         const { data } = await supabaseClient.auth.getSession();
         currentSessionUser = data && data.session ? data.session.user : null;
+        await refreshAuthorSnapshot();
         updateCommunityAuthState();
-        supabaseClient.auth.onAuthStateChange(function (_event, session) {
+        supabaseClient.auth.onAuthStateChange(async function (_event, session) {
           currentSessionUser = session ? session.user : null;
+          await refreshAuthorSnapshot();
           updateCommunityAuthState();
         });
       } else {
