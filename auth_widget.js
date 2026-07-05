@@ -49,6 +49,10 @@
       '.field input{width:100%;height:42px;border:1px solid #d3ddd9;border-radius:10px;padding:0 12px;font-size:14px;color:#1f2b2b}',
       '.field input:focus{outline:none;border-color:#126b5f;box-shadow:0 0 0 3px rgba(18,107,95,.14)}',
       '.field .hint{font-size:11px;color:#7a8a87}',
+      '.avatar-edit{display:flex;align-items:center;gap:14px;flex-wrap:wrap}',
+      '.avatar-preview{width:76px;height:76px;border-radius:50%;object-fit:cover;background:#e7efec;border:1px solid #d3ddd9;display:none}',
+      '.avatar-actions{display:flex;gap:8px;flex-wrap:wrap}',
+      '.avatar-actions .btn{height:38px;padding:0 14px;font-size:13px}',
       '.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}',
       '.check{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:#31504d;line-height:1.4;padding:10px 12px;border:1px solid #e6edea;border-radius:10px;background:#f9fcfb}',
       '.check input{margin-top:2px}',
@@ -179,8 +183,18 @@
       '            <input id="acc-neighborhood" type="text" autocomplete="address-level3" />',
       '          </div>',
       '          <div class="field full">',
-      '            <label for="acc-avatar-url">URL da foto</label>',
-      '            <input id="acc-avatar-url" type="url" placeholder="https://..." />',
+      '            <label>Foto de perfil</label>',
+      '            <div class="avatar-edit">',
+      '              <img id="acc-avatar-preview" class="avatar-preview" alt="Foto de perfil" />',
+      '              <div class="avatar-actions">',
+      '                <button type="button" class="btn secondary" id="acc-photo-upload-btn">Enviar arquivo</button>',
+      '                <button type="button" class="btn secondary" id="acc-photo-camera-btn">Usar camera</button>',
+      '              </div>',
+      '              <input type="file" id="acc-photo-file" accept="image/*" style="display:none" />',
+      '              <input type="file" id="acc-photo-camera" accept="image/*" capture="user" style="display:none" />',
+      '              <input type="hidden" id="acc-avatar-url" />',
+      '              <span class="hint" id="acc-photo-status"></span>',
+      '            </div>',
       '          </div>',
       '        </div>',
       '      </div>',
@@ -261,6 +275,78 @@
       privacy: accountOverlay.querySelector('#acc-privacy')
     };
 
+    const avatarPreview = accountOverlay.querySelector('#acc-avatar-preview');
+    const photoFileInput = accountOverlay.querySelector('#acc-photo-file');
+    const photoCameraInput = accountOverlay.querySelector('#acc-photo-camera');
+    const photoUploadBtn = accountOverlay.querySelector('#acc-photo-upload-btn');
+    const photoCameraBtn = accountOverlay.querySelector('#acc-photo-camera-btn');
+    const photoStatus = accountOverlay.querySelector('#acc-photo-status');
+
+    function setAvatarPreview(url) {
+      if (url) {
+        avatarPreview.src = url;
+        avatarPreview.style.display = 'block';
+      } else {
+        avatarPreview.removeAttribute('src');
+        avatarPreview.style.display = 'none';
+      }
+    }
+
+    let menuInitials = '';
+    function setMenuAvatar(url) {
+      if (url) {
+        avatarEl.textContent = '';
+        avatarEl.style.backgroundImage = 'url("' + url + '")';
+        avatarEl.style.backgroundSize = 'cover';
+        avatarEl.style.backgroundPosition = 'center';
+      } else {
+        avatarEl.style.backgroundImage = 'none';
+        avatarEl.textContent = menuInitials;
+      }
+    }
+
+    async function handleAvatarFile(file) {
+      if (!file) return;
+      if (!currentUserId) {
+        photoStatus.textContent = 'Faca login para enviar foto.';
+        return;
+      }
+      if (!/^image\//.test(file.type)) {
+        photoStatus.textContent = 'Selecione um arquivo de imagem.';
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        photoStatus.textContent = 'Imagem muito grande (maximo 5MB).';
+        return;
+      }
+
+      photoStatus.textContent = 'Enviando foto...';
+      try {
+        const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+        const path = currentUserId + '/avatar_' + Date.now() + '.' + ext;
+        const up = await client.storage.from('avatars').upload(path, file, { upsert: true, contentType: file.type });
+        if (up.error) throw up.error;
+
+        const pub = client.storage.from('avatars').getPublicUrl(path);
+        const url = (pub && pub.data && pub.data.publicUrl) ? pub.data.publicUrl : '';
+        fields.avatarUrl.value = url;
+        setAvatarPreview(url);
+        setMenuAvatar(url);
+
+        const upd = await client.from('profiles').upsert({ id: currentUserId, avatar_url: url }, { onConflict: 'id' });
+        if (upd.error) throw upd.error;
+
+        photoStatus.textContent = 'Foto atualizada.';
+      } catch (err) {
+        photoStatus.textContent = 'Falha ao enviar foto: ' + (err.message || 'erro desconhecido');
+      }
+    }
+
+    photoUploadBtn.addEventListener('click', function () { photoFileInput.click(); });
+    photoCameraBtn.addEventListener('click', function () { photoCameraInput.click(); });
+    photoFileInput.addEventListener('change', function (e) { handleAvatarFile(e.target.files && e.target.files[0]); this.value = ''; });
+    photoCameraInput.addEventListener('change', function (e) { handleAvatarFile(e.target.files && e.target.files[0]); this.value = ''; });
+
     function setMenuOpen(open) {
       menuPanel.classList.toggle('open', Boolean(open));
     }
@@ -296,7 +382,7 @@
         const consentRes = await client.from('user_marketing_consent').select('email_opt_in,whatsapp_opt_in,accepted_terms_at,accepted_privacy_at').eq('user_id', userId).maybeSingle();
         if (consentRes.error) throw consentRes.error;
 
-        const privateRes = await client.from('user_private_data').select('cpf_last4').eq('user_id', userId).maybeSingle();
+        const privateRes = await client.from('user_private_data').select('cpf,cpf_last4').eq('user_id', userId).maybeSingle();
         if (privateRes.error) throw privateRes.error;
 
         const profile = profileRes.data || {};
@@ -308,7 +394,8 @@
         fields.city.value = profile.city || '';
         fields.neighborhood.value = profile.neighborhood || '';
         fields.avatarUrl.value = profile.avatar_url || '';
-        fields.cpf.value = '';
+        setAvatarPreview(profile.avatar_url || '');
+        setMenuAvatar(profile.avatar_url || '');
 
         acceptedTermsAt = consent.accepted_terms_at || null;
         acceptedPrivacyAt = consent.accepted_privacy_at || null;
@@ -317,9 +404,9 @@
         fields.terms.checked = Boolean(consent.accepted_terms_at);
         fields.privacy.checked = Boolean(consent.accepted_privacy_at);
 
-        fields.cpfInfo.textContent = privateData.cpf_last4
-          ? ('CPF salvo. Finais: ' + privateData.cpf_last4)
-          : 'CPF ainda nao informado.';
+        fields.cpf.value = privateData.cpf || '';
+        fields.cpfInfo.textContent = privateData.cpf ? '' : 'CPF ainda nao informado.';
+        if (photoStatus) photoStatus.textContent = '';
       } catch (err) {
         setStatus(accStatus, 'Falha ao carregar perfil: ' + (err.message || 'erro desconhecido'), 'error');
       }
@@ -376,20 +463,16 @@
         acceptedTermsAt = finalTermsAt;
         acceptedPrivacyAt = finalPrivacyAt;
 
-        if (cpfDigits) {
-          const cpfHash = await sha256Hex(cpfDigits);
-          const privatePayload = {
-            user_id: currentUserId,
-            cpf_hash: cpfHash,
-            cpf_last4: cpfDigits.slice(-4)
-          };
+        const privatePayload = {
+          user_id: currentUserId,
+          cpf: fields.cpf.value.trim() || null,
+          cpf_last4: cpfDigits ? cpfDigits.slice(-4) : null
+        };
 
-          const privateUpsert = await client.from('user_private_data').upsert(privatePayload, { onConflict: 'user_id' });
-          if (privateUpsert.error) throw privateUpsert.error;
+        const privateUpsert = await client.from('user_private_data').upsert(privatePayload, { onConflict: 'user_id' });
+        if (privateUpsert.error) throw privateUpsert.error;
 
-          fields.cpf.value = '';
-          fields.cpfInfo.textContent = 'CPF salvo. Finais: ' + cpfDigits.slice(-4);
-        }
+        fields.cpfInfo.textContent = cpfDigits ? '' : 'CPF ainda nao informado.';
 
         setStatus(accStatus, 'Perfil salvo com sucesso.', 'ok');
       } catch (err) {
@@ -403,7 +486,8 @@
       const user = session && session.user ? session.user : null;
       if (user) {
         avatarEl.style.display = 'grid';
-        avatarEl.textContent = initialsFromEmail(user.email || user.id);
+        menuInitials = initialsFromEmail(user.email || user.id);
+        setMenuAvatar('');
         captionEl.textContent = (user.email || '').split('@')[0] || 'Conta';
         userLine.style.display = 'block';
         userNameEl.textContent = user.email || user.id;

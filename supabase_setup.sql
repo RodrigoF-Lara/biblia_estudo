@@ -42,6 +42,9 @@ create table if not exists public.user_private_data (
   constraint cpf_last4_len check (cpf_last4 is null or char_length(cpf_last4) = 4)
 );
 
+alter table public.user_private_data
+  add column if not exists cpf text;
+
 create or replace function public.set_updated_at()
 returns trigger
 language plpgsql
@@ -267,4 +270,49 @@ for select
 using (auth.uid() = user_id);
 
 comment on table public.admin_users is 'Lista de usuarios administradores. Inserir manualmente no SQL Editor ou backend com service role.';
-comment on table public.user_private_data is 'Dados sensiveis por usuario. CPF salvo como hash + finais.';
+comment on table public.user_private_data is 'Dados sensiveis por usuario. CPF completo + finais.';
+
+-- Storage: bucket de fotos de perfil (avatars)
+insert into storage.buckets (id, name, public)
+values ('avatars', 'avatars', true)
+on conflict (id) do nothing;
+
+drop policy if exists "avatars_public_read" on storage.objects;
+create policy "avatars_public_read"
+on storage.objects
+for select
+using (bucket_id = 'avatars');
+
+drop policy if exists "avatars_insert_own" on storage.objects;
+create policy "avatars_insert_own"
+on storage.objects
+for insert
+to authenticated
+with check (
+  bucket_id = 'avatars'
+  and (storage.foldername(name))[1] = auth.uid()::text
+);
+
+drop policy if exists "avatars_update_own" on storage.objects;
+create policy "avatars_update_own"
+on storage.objects
+for update
+to authenticated
+using (
+  bucket_id = 'avatars'
+  and (storage.foldername(name))[1] = auth.uid()::text
+)
+with check (
+  bucket_id = 'avatars'
+  and (storage.foldername(name))[1] = auth.uid()::text
+);
+
+drop policy if exists "avatars_delete_own" on storage.objects;
+create policy "avatars_delete_own"
+on storage.objects
+for delete
+to authenticated
+using (
+  bucket_id = 'avatars'
+  and (storage.foldername(name))[1] = auth.uid()::text
+);

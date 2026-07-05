@@ -32,7 +32,9 @@ No painel: SQL Editor
 
 1. Abra o arquivo supabase_setup.sql deste projeto.
 2. Copie e execute todo o script.
-3. Se voce ja tinha executado antes, execute novamente a versao atual para criar os novos campos (bairro) e a tabela user_private_data.
+3. Se voce ja tinha executado antes, execute novamente a versao atual. Isso cria/atualiza:
+   - campo bairro e campo cpf (completo) em user_private_data
+   - bucket de fotos "avatars" (Storage) com politicas RLS por usuario
 
 ## 4) Tornar seu usuario admin
 Depois do seu primeiro login:
