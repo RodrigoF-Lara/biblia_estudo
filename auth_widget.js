@@ -36,6 +36,7 @@
       '.auth-check{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#365250;line-height:1.3}',
       '.auth-check input{margin-top:1px}',
       '.auth-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}',
+      '.auth-password-box{display:grid;gap:8px;margin-top:8px;padding:8px;border:1px dashed #c8d8d3;border-radius:10px;background:#f9fcfb}',
       '.auth-toggle{display:inline-flex;align-items:center;justify-content:center;height:32px;padding:0 10px;border-radius:8px;border:1px solid #b8cec8;background:#f3f9f7;color:#154842;font-size:12px;font-weight:700;cursor:pointer}',
       '.auth-small{font-size:11px;color:#5a6f6e;margin:0}',
       '.auth-status{margin:6px 0 0;font-size:12px;line-height:1.4;color:#3a5553}',
@@ -78,6 +79,13 @@
       '  <div class="auth-row">',
       '    <button class="auth-toggle" id="auth-toggle-profile" type="button">Completar perfil</button>',
       '    <button class="auth-btn secondary" id="auth-logout">Sair</button>',
+      '  </div>',
+      '  <div class="auth-password-box">',
+      '    <p class="auth-small">Primeiro acesso por link magico? Defina uma senha para os proximos logins.</p>',
+      '    <div class="auth-row">',
+      '      <input class="auth-input" id="auth-new-password" type="password" placeholder="Nova senha (minimo 6)" autocomplete="new-password"/>',
+      '      <button class="auth-btn secondary" id="auth-set-password" type="button">Definir senha</button>',
+      '    </div>',
       '  </div>',
       '  <div class="auth-divider"></div>',
       '  <form class="auth-form" id="auth-profile-form" style="display:none">',
@@ -155,6 +163,8 @@
     const loginPasswordBtn = widget.querySelector('#auth-login-password');
     const signupPasswordBtn = widget.querySelector('#auth-signup-password');
     const logoutBtn = widget.querySelector('#auth-logout');
+    const setPasswordBtn = widget.querySelector('#auth-set-password');
+    const newPasswordInput = widget.querySelector('#auth-new-password');
     const toggleProfileBtn = widget.querySelector('#auth-toggle-profile');
     const profileForm = widget.querySelector('#auth-profile-form');
     const saveProfileBtn = widget.querySelector('#auth-save-profile');
@@ -375,6 +385,30 @@
         signupPasswordBtn.disabled = false;
       });
     }
+
+    setPasswordBtn.addEventListener('click', async function () {
+      const newPassword = (newPasswordInput.value || '').trim();
+      if (!newPassword || newPassword.length < 6) {
+        setStatus(statusEl, 'Nova senha deve ter no minimo 6 caracteres.', 'error');
+        newPasswordInput.focus();
+        return;
+      }
+
+      setPasswordBtn.disabled = true;
+      setStatus(statusEl, 'Salvando nova senha...', '');
+      try {
+        const result = await client.auth.updateUser({ password: newPassword });
+        if (result.error) {
+          throw result.error;
+        }
+        newPasswordInput.value = '';
+        setStatus(statusEl, 'Senha definida com sucesso. Proximos logins podem ser por senha.', 'ok');
+      } catch (err) {
+        setStatus(statusEl, 'Falha ao definir senha: ' + (err.message || 'erro desconhecido'), 'error');
+      } finally {
+        setPasswordBtn.disabled = false;
+      }
+    });
 
     function renderSession(session) {
       const user = session && session.user ? session.user : null;
