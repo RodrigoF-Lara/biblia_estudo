@@ -37,7 +37,7 @@ No painel: SQL Editor
    - bucket de fotos "avatars" (Storage) com politicas RLS por usuario
 
 ## 4) Tornar seu usuario admin
-Depois do seu primeiro login:
+Depois do seu primeiro login: 
 
 1. Va em Authentication > Users e copie seu User ID.
 2. No SQL Editor, rode:
