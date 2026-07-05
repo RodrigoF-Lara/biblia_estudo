@@ -337,6 +337,31 @@
       font-weight: 800;
     }
 
+    .translation-toggle {
+      height: 30px;
+      width: fit-content;
+      border-radius: 999px;
+      border: 1px solid #cfe0dc;
+      background: #f2f8f7;
+      color: #0f4f47;
+      padding: 0 11px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.45px;
+      text-transform: uppercase;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .translation-toggle[data-expanded="true"] {
+      background: #126b5f;
+      color: #fff;
+      border-color: #126b5f;
+      text-transform: none;
+      letter-spacing: 0.2px;
+      font-size: 11.5px;
+    }
+
     .translation p {
       margin: 0;
       white-space: pre-wrap;
@@ -703,29 +728,28 @@
       <p id="hero-subtitle">Visualizacao alternativa com os mesmos dados dos arquivos markdown.</p>
       <div class="hero-meta">
         <span class="pill" id="pill-ref">Referencia: --</span>
-        <span class="pill" id="pill-layout">Modo: Novo</span>
       </div>
     </section>
 
     <section class="card stack">
       <div class="section-title">
         <h2>Texto Biblico</h2>
-        <span>NVI | NAA | NLT</span>
+        <span>Clique na sigla para ver o nome completo</span>
       </div>
 
       <div class="scripture-grid">
         <article class="translation">
-          <h3>NVI</h3>
+          <button class="translation-toggle" type="button" data-short="NVI" data-full="Nova Versao Internacional" data-expanded="false">NVI</button>
           <p id="nvi-content"></p>
         </article>
 
         <article class="translation">
-          <h3>NAA</h3>
+          <button class="translation-toggle" type="button" data-short="NAA" data-full="Nova Almeida Atualizada" data-expanded="false">NAA</button>
           <p id="naa-content"></p>
         </article>
 
         <article class="translation">
-          <h3>NLT (Ingles)</h3>
+          <button class="translation-toggle" type="button" data-short="NLT" data-full="New Living Translation (Ingles)" data-expanded="false">NLT</button>
           <p id="nlt-content"></p>
         </article>
       </div>
@@ -1459,7 +1483,7 @@
 
         if (resolvedStudy) {
           document.getElementById('hero-subtitle').textContent =
-            'Leitura estruturada de ' + resolvedStudy.livro + ' ' + resolvedStudy.capitulo + ':' + resolvedStudy.versiculoInicio + '-' + resolvedStudy.versiculoFim + ' com visualizacao alternativa.';
+            'Leitura estruturada de ' + resolvedStudy.livro + ' ' + resolvedStudy.capitulo + ':' + resolvedStudy.versiculoInicio + '-' + resolvedStudy.versiculoFim ;
           document.getElementById('pill-ref').textContent =
             'Referencia: ' + resolvedStudy.livro + ' ' + resolvedStudy.capitulo + ':' + resolvedStudy.versiculoInicio + '-' + resolvedStudy.versiculoFim;
         } else {
@@ -1538,8 +1562,23 @@
       }
     }
 
+    function initTranslationBadges() {
+      const toggles = document.querySelectorAll('.translation-toggle');
+      toggles.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          const isExpanded = btn.getAttribute('data-expanded') === 'true';
+          const next = !isExpanded;
+          btn.setAttribute('data-expanded', String(next));
+          btn.textContent = next
+            ? (btn.getAttribute('data-full') || btn.textContent)
+            : (btn.getAttribute('data-short') || btn.textContent);
+        });
+      });
+    }
+
     window.addEventListener('resize', balanceScriptureFonts);
 
+    initTranslationBadges();
     renderFromMarkdown();
   </script>
 </body>
