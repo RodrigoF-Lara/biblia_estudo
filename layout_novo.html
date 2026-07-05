@@ -217,6 +217,16 @@
       text-wrap: balance;
     }
 
+    .hero h1.quick-trigger {
+      cursor: pointer;
+      width: fit-content;
+      border-bottom: 2px dashed rgba(255, 255, 255, 0.35);
+    }
+
+    .hero h1.quick-trigger:hover {
+      border-bottom-color: rgba(255, 255, 255, 0.75);
+    }
+
     .hero p {
       margin: 0;
       color: rgba(246, 251, 250, 0.9);
@@ -645,6 +655,127 @@
       font-size: 14px;
     }
 
+    .quick-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 12000;
+      background: rgba(13, 29, 27, 0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .quick-overlay.open {
+      display: flex;
+    }
+
+    .quick-modal {
+      width: min(560px, 100%);
+      border-radius: 16px;
+      border: 1px solid #d8e1dd;
+      background: #fff;
+      box-shadow: 0 20px 48px rgba(11, 36, 33, 0.34);
+      overflow: hidden;
+    }
+
+    .quick-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 14px 18px;
+      border-bottom: 1px solid #e8efec;
+      background: #f7fbfa;
+    }
+
+    .quick-head strong {
+      font-size: 18px;
+      color: #143b37;
+    }
+
+    .quick-close {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid #d0ddda;
+      background: #fff;
+      cursor: pointer;
+      font-size: 20px;
+      color: #385754;
+      line-height: 1;
+    }
+
+    .quick-close:hover {
+      background: #f0f6f4;
+    }
+
+    .quick-body {
+      padding: 16px 18px 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .quick-body p {
+      margin: 0;
+      font-size: 14px;
+      color: #4a6461;
+    }
+
+    .quick-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1.5fr 1fr 1fr;
+    }
+
+    .quick-field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .quick-field label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #4d6663;
+      text-transform: uppercase;
+      letter-spacing: 0.45px;
+    }
+
+    .quick-field input,
+    .quick-field select {
+      height: 42px;
+      border-radius: 10px;
+      border: 1px solid #cfe0dc;
+      padding: 0 12px;
+      background: #fff;
+      color: #173432;
+      font: inherit;
+    }
+
+    .quick-field input:focus,
+    .quick-field select:focus {
+      outline: none;
+      border-color: #126b5f;
+      box-shadow: 0 0 0 3px rgba(18, 107, 95, 0.14);
+    }
+
+    .quick-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .quick-status {
+      min-height: 18px;
+      font-size: 13px;
+      color: #3b5b58;
+    }
+
+    .quick-status.error {
+      color: #8d3939;
+    }
+
     .footer-note {
       text-align: center;
       color: #637271;
@@ -702,6 +833,10 @@
         font-size: 12px;
         min-height: 30px;
       }
+
+      .quick-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -724,7 +859,7 @@
   <main class="site">
     <section class="hero">
       <span class="hero-tag">Leitura e contemplacao</span>
-      <h1 id="hero-title">Carregando estudo...</h1>
+      <h1 id="hero-title" class="quick-trigger" title="Clique para trocar estudo rapido">Carregando estudo...</h1>
       <p id="hero-subtitle">Visualizacao alternativa com os mesmos dados dos arquivos markdown.</p>
       <div class="hero-meta">
         <span class="pill" id="pill-ref">Referencia: --</span>
@@ -823,6 +958,38 @@
     <p class="footer-note">Visual oficial do projeto com leitura a partir dos mesmos arquivos markdown.</p>
   </main>
 
+  <div class="quick-overlay" id="quick-study-overlay" aria-hidden="true">
+    <div class="quick-modal" role="dialog" aria-modal="true" aria-label="Troca rapida de estudo">
+      <div class="quick-head">
+        <strong>Troca rapida de estudo</strong>
+        <button class="quick-close" id="quick-close-btn" type="button" aria-label="Fechar">&times;</button>
+      </div>
+      <div class="quick-body">
+        <p>Digite o livro e selecione capitulo e versiculo.</p>
+        <div class="quick-grid">
+          <div class="quick-field">
+            <label for="quick-livro">Livro</label>
+            <input id="quick-livro" list="quick-livro-list" placeholder="Ex.: Atos" autocomplete="off" />
+            <datalist id="quick-livro-list"></datalist>
+          </div>
+          <div class="quick-field">
+            <label for="quick-capitulo">Capitulo</label>
+            <select id="quick-capitulo"></select>
+          </div>
+          <div class="quick-field">
+            <label for="quick-versiculo">Versiculo</label>
+            <select id="quick-versiculo"></select>
+          </div>
+        </div>
+        <div class="quick-status" id="quick-status"></div>
+        <div class="quick-actions">
+          <button class="ghost-btn" id="quick-cancel-btn" type="button">Cancelar</button>
+          <button class="btn" id="quick-open-btn" type="button">Abrir estudo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="auth_widget.js"></script>
@@ -852,6 +1019,7 @@
     let recordingTimerId = null;
     let recordingStartedAt = 0;
     let authorSnapshot = { name: '', avatarUrl: '' };
+    let quickPickerReady = false;
 
     function deriveImageDirFromMarkdownPath(markdownPath) {
       const normalized = (markdownPath || '').replace(/\\/g, '/');
@@ -952,6 +1120,243 @@
       }
 
       resolvedImageDir = deriveImageDirFromMarkdownPath(resolvedMdPath);
+    }
+
+    async function ensureStudiesIndexLoaded() {
+      if (studiesIndex.length) {
+        return studiesIndex;
+      }
+      const response = await fetch('estudos_index.json');
+      if (!response.ok) {
+        throw new Error('Falha ao carregar estudos_index.json');
+      }
+      const index = await response.json();
+      studiesIndex = Array.isArray(index.estudos) ? index.estudos : [];
+      return studiesIndex;
+    }
+
+    function normalizeBookName(value) {
+      return String(value || '').trim().toLowerCase();
+    }
+
+    function findStudyByReference(livro, capitulo, versiculo) {
+      const candidatos = studiesIndex
+        .filter(function (item) {
+          return normalizeBookName(item.livro) === normalizeBookName(livro)
+            && Number(item.capitulo) === Number(capitulo)
+            && Number(versiculo) >= Number(item.versiculoInicio)
+            && Number(versiculo) <= Number(item.versiculoFim);
+        })
+        .sort(function (a, b) {
+          const spanA = Number(a.versiculoFim) - Number(a.versiculoInicio);
+          const spanB = Number(b.versiculoFim) - Number(b.versiculoInicio);
+          return spanA - spanB;
+        });
+
+      return candidatos[0] || null;
+    }
+
+    function setQuickStatus(message, isError) {
+      const el = document.getElementById('quick-status');
+      if (!el) return;
+      el.textContent = message || '';
+      el.className = 'quick-status' + (isError ? ' error' : '');
+    }
+
+    function fillQuickBooks() {
+      const input = document.getElementById('quick-livro');
+      const datalist = document.getElementById('quick-livro-list');
+      if (!input || !datalist) return;
+
+      const livros = Array.from(new Set(studiesIndex.map(function (item) { return item.livro; })))
+        .sort(function (a, b) { return String(a).localeCompare(String(b), 'pt-BR'); });
+
+      datalist.innerHTML = livros.map(function (livro) {
+        return '<option value="' + livro + '"></option>';
+      }).join('');
+
+      if (!input.value) {
+        input.value = resolvedStudy && resolvedStudy.livro ? resolvedStudy.livro : (livros[0] || '');
+      }
+    }
+
+    function fillQuickChapters() {
+      const livroInput = document.getElementById('quick-livro');
+      const capSelect = document.getElementById('quick-capitulo');
+      if (!livroInput || !capSelect) return;
+
+      const livro = livroInput.value;
+      const capitulos = Array.from(new Set(
+        studiesIndex
+          .filter(function (item) { return normalizeBookName(item.livro) === normalizeBookName(livro); })
+          .map(function (item) { return Number(item.capitulo); })
+          .filter(function (value) { return Number.isFinite(value); })
+      )).sort(function (a, b) { return a - b; });
+
+      capSelect.innerHTML = capitulos.map(function (cap) {
+        return '<option value="' + cap + '">' + cap + '</option>';
+      }).join('');
+
+      if (resolvedStudy && normalizeBookName(resolvedStudy.livro) === normalizeBookName(livro)) {
+        capSelect.value = String(resolvedStudy.capitulo);
+      }
+      if (!capSelect.value && capitulos.length) {
+        capSelect.value = String(capitulos[0]);
+      }
+    }
+
+    function fillQuickVerses() {
+      const livroInput = document.getElementById('quick-livro');
+      const capSelect = document.getElementById('quick-capitulo');
+      const verSelect = document.getElementById('quick-versiculo');
+      if (!livroInput || !capSelect || !verSelect) return;
+
+      const livro = livroInput.value;
+      const capitulo = Number(capSelect.value);
+      const set = new Set();
+
+      studiesIndex
+        .filter(function (item) {
+          return normalizeBookName(item.livro) === normalizeBookName(livro)
+            && Number(item.capitulo) === capitulo;
+        })
+        .forEach(function (item) {
+          const ini = Number(item.versiculoInicio);
+          const fim = Number(item.versiculoFim);
+          for (let v = ini; v <= fim; v += 1) {
+            set.add(v);
+          }
+        });
+
+      const versiculos = Array.from(set).sort(function (a, b) { return a - b; });
+      verSelect.innerHTML = versiculos.map(function (v) {
+        return '<option value="' + v + '">' + v + '</option>';
+      }).join('');
+
+      if (resolvedStudy
+        && normalizeBookName(resolvedStudy.livro) === normalizeBookName(livro)
+        && Number(resolvedStudy.capitulo) === capitulo) {
+        verSelect.value = String(resolvedStudy.versiculoInicio);
+      }
+      if (!verSelect.value && versiculos.length) {
+        verSelect.value = String(versiculos[0]);
+      }
+    }
+
+    async function openQuickPicker() {
+      const overlay = document.getElementById('quick-study-overlay');
+      if (!overlay) return;
+      try {
+        await ensureStudiesIndexLoaded();
+        fillQuickBooks();
+        fillQuickChapters();
+        fillQuickVerses();
+        setQuickStatus('', false);
+        overlay.classList.add('open');
+        overlay.setAttribute('aria-hidden', 'false');
+        const livroInput = document.getElementById('quick-livro');
+        if (livroInput) livroInput.focus();
+      } catch (error) {
+        setStatus('Nao foi possivel abrir troca rapida: ' + error.message, true);
+      }
+    }
+
+    function closeQuickPicker() {
+      const overlay = document.getElementById('quick-study-overlay');
+      if (!overlay) return;
+      overlay.classList.remove('open');
+      overlay.setAttribute('aria-hidden', 'true');
+    }
+
+    async function openStudyFromQuickPicker() {
+      await ensureStudiesIndexLoaded();
+      const livroInput = document.getElementById('quick-livro');
+      const capSelect = document.getElementById('quick-capitulo');
+      const verSelect = document.getElementById('quick-versiculo');
+      if (!livroInput || !capSelect || !verSelect) return;
+
+      const livro = String(livroInput.value || '').trim();
+      const capitulo = Number(capSelect.value);
+      const versiculo = Number(verSelect.value);
+
+      if (!livro || !Number.isFinite(capitulo) || !Number.isFinite(versiculo)) {
+        setQuickStatus('Informe livro, capitulo e versiculo validos.', true);
+        return;
+      }
+
+      const estudo = findStudyByReference(livro, capitulo, versiculo);
+      if (!estudo) {
+        setQuickStatus('Nenhum estudo encontrado para essa referencia.', true);
+        return;
+      }
+
+      window.location.href = 'layout_novo.html?estudoId=' + encodeURIComponent(estudo.id);
+    }
+
+    function initQuickStudyPicker() {
+      if (quickPickerReady) return;
+      quickPickerReady = true;
+
+      const heroTitle = document.getElementById('hero-title');
+      const overlay = document.getElementById('quick-study-overlay');
+      const closeBtn = document.getElementById('quick-close-btn');
+      const cancelBtn = document.getElementById('quick-cancel-btn');
+      const openBtn = document.getElementById('quick-open-btn');
+      const livroInput = document.getElementById('quick-livro');
+      const capSelect = document.getElementById('quick-capitulo');
+      const verSelect = document.getElementById('quick-versiculo');
+
+      if (heroTitle) {
+        heroTitle.addEventListener('click', openQuickPicker);
+      }
+      if (closeBtn) {
+        closeBtn.addEventListener('click', closeQuickPicker);
+      }
+      if (cancelBtn) {
+        cancelBtn.addEventListener('click', closeQuickPicker);
+      }
+      if (openBtn) {
+        openBtn.addEventListener('click', openStudyFromQuickPicker);
+      }
+      if (overlay) {
+        overlay.addEventListener('click', function (event) {
+          if (event.target === overlay) {
+            closeQuickPicker();
+          }
+        });
+      }
+      if (livroInput) {
+        livroInput.addEventListener('input', function () {
+          fillQuickChapters();
+          fillQuickVerses();
+          setQuickStatus('', false);
+        });
+        livroInput.addEventListener('keydown', function (event) {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            openStudyFromQuickPicker();
+          }
+        });
+      }
+      if (capSelect) {
+        capSelect.addEventListener('change', function () {
+          fillQuickVerses();
+          setQuickStatus('', false);
+        });
+      }
+      if (verSelect) {
+        verSelect.addEventListener('keydown', function (event) {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            openStudyFromQuickPicker();
+          }
+        });
+      }
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+          closeQuickPicker();
+        }
+      });
     }
 
     function updatePrevNextLinks() {
@@ -1578,6 +1983,7 @@
 
     window.addEventListener('resize', balanceScriptureFonts);
 
+    initQuickStudyPicker();
     initTranslationBadges();
     renderFromMarkdown();
   </script>
