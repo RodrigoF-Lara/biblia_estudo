@@ -72,6 +72,9 @@
       '  <div class="auth-row" style="margin-top:8px">',
       '    <button class="auth-btn secondary" id="auth-login">Entrar por link magico</button>',
       '  </div>',
+      '  <div class="auth-row" style="margin-top:8px">',
+      '    <button class="auth-btn secondary" id="auth-reset-password">Definir senha por email</button>',
+      '  </div>',
       '  <p class="auth-meta">Depois do login com senha, a sessao fica ativa no navegador.</p>',
       '</div>',
       '<div class="auth-logged-in" style="display:none">',
@@ -160,6 +163,7 @@
     const emailInput = widget.querySelector('#auth-email');
     const passwordInput = widget.querySelector('#auth-password');
     const loginBtn = widget.querySelector('#auth-login');
+    const resetPasswordBtn = widget.querySelector('#auth-reset-password');
     const loginPasswordBtn = widget.querySelector('#auth-login-password');
     const signupPasswordBtn = widget.querySelector('#auth-signup-password');
     const logoutBtn = widget.querySelector('#auth-logout');
@@ -377,10 +381,12 @@
 
     function withButtonsDisabled(callback) {
       loginBtn.disabled = true;
+      resetPasswordBtn.disabled = true;
       loginPasswordBtn.disabled = true;
       signupPasswordBtn.disabled = true;
       return callback().finally(function () {
         loginBtn.disabled = false;
+        resetPasswordBtn.disabled = false;
         loginPasswordBtn.disabled = false;
         signupPasswordBtn.disabled = false;
       });
@@ -471,6 +477,32 @@
       });
     });
 
+    resetPasswordBtn.addEventListener('click', async function () {
+      const creds = readCredentials();
+      if (!creds) {
+        return;
+      }
+
+      await withButtonsDisabled(async function () {
+        setStatus(statusEl, 'Enviando email para definir senha...', '');
+        try {
+          const redirect = config.defaultRedirectTo || (window.location.origin + window.location.pathname);
+          const result = await client.auth.resetPasswordForEmail(creds.email, {
+            redirectTo: redirect
+          });
+
+          if (result.error) {
+            throw result.error;
+          }
+
+          setWidgetOpen(true);
+          setStatus(statusEl, 'Email enviado. Abra o link para definir sua senha.', 'ok');
+        } catch (err) {
+          setStatus(statusEl, 'Falha ao enviar email de senha: ' + (err.message || 'erro desconhecido'), 'error');
+        }
+      });
+    });
+
     loginPasswordBtn.addEventListener('click', async function () {
       const creds = readCredentials();
       if (!creds) {
@@ -527,7 +559,9 @@
             throw result.error;
           }
 
-          if (result.data && result.data.session) {
+          if (result.data && result.data.user && Array.isArray(result.data.user.identities) && result.data.user.identities.length === 0) {
+            setStatus(statusEl, 'Esse email ja possui conta. Use "Entrar por link magico" e depois "Definir senha".', 'error');
+          } else if (result.data && result.data.session) {
             setWidgetOpen(true);
             setStatus(statusEl, 'Conta criada e login ativo.', 'ok');
           } else {
