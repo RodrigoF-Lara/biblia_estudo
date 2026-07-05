@@ -54,7 +54,7 @@ on conflict (user_id) do nothing;
 7. Clique em "Salvar perfil" e confirme a mensagem de sucesso.
 
 ## 6) Teste em producao (GitHub Pages)
-1. Publique com seu comando d -Message "...".
+1. Publique com seu comando d -Message "....".
 2. Abra https://rodrigof-lara.github.io/biblia_estudo/
 3. Repita o fluxo de login e confirme sessao ativa.
 
