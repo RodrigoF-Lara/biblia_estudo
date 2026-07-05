@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
   const config = window.BIBLIA_SUPABASE_CONFIG || {};
   const hasConfig = Boolean(config.url && config.anonKey);
 
@@ -9,76 +9,88 @@
   function injectStyles() {
     const style = document.createElement('style');
     style.textContent = [
-      '.auth-widget{width:100%;max-width:520px;font-family:Arial,sans-serif;color:#1f2b2b}',
+      '.auth-widget{position:relative;display:inline-flex;justify-content:flex-end;font-family:Arial,Helvetica,sans-serif;color:#1f2b2b}',
       '.auth-widget *{box-sizing:border-box}',
-      '.auth-bar{display:flex;align-items:center;gap:8px;justify-content:space-between;padding:8px 10px;border:1px solid #d8dfda;border-radius:10px;background:#fff;box-shadow:0 6px 14px rgba(11,41,39,.08)}',
-      '.auth-left{display:flex;align-items:center;gap:8px;min-width:0}',
-      '.auth-name{font-size:12px;color:#2f4c49;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px}',
-      '.auth-btn{height:32px;border:1px solid #126b5f;background:#126b5f;color:#fff;border-radius:8px;padding:0 10px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}',
-      '.auth-btn:hover{background:#0f5c52;border-color:#0f5c52}',
-      '.auth-btn.secondary{background:#fff;color:#144641;border-color:#b8cec8}',
-      '.auth-btn.secondary:hover{background:#f3f9f7}',
-      '.auth-icon-btn{width:32px;min-width:32px;padding:0;font-size:16px;line-height:1}',
-      '.auth-panel{display:none;margin-top:8px;padding:10px;border:1px solid #d8dfda;border-radius:10px;background:#fff;box-shadow:0 8px 20px rgba(11,41,39,.10)}',
+      '.auth-bar{display:inline-flex;align-items:center;gap:8px;padding:5px 6px;border:1px solid #e4ebe8;border-radius:999px;background:#fff;box-shadow:0 2px 8px rgba(16,46,43,.08)}',
+      '.auth-avatar{width:30px;height:30px;border-radius:50%;background:#126b5f;color:#fff;display:none;place-items:center;font-size:12px;font-weight:700;flex:0 0 auto}',
+      '.auth-name{font-size:13px;font-weight:600;color:#243b39;max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 2px;display:none}',
+      '.auth-iconbtn{width:32px;height:32px;border-radius:50%;border:1px solid #dce6e2;background:#f6faf9;cursor:pointer;display:none;align-items:center;justify-content:center;padding:0}',
+      '.auth-iconbtn:hover{background:#eef5f2}',
+      '.auth-ghost{height:32px;border:1px solid #dce6e2;background:#fff;color:#2f4c49;border-radius:999px;padding:0 14px;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}',
+      '.auth-ghost:hover{background:#f3f7f5}',
+      '.auth-primary{height:32px;border:1px solid #126b5f;background:#126b5f;color:#fff;border-radius:999px;padding:0 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}',
+      '.auth-primary:hover{background:#0f5c52;border-color:#0f5c52}',
+      '.auth-panel{position:absolute;right:0;top:calc(100% + 8px);width:min(360px,92vw);max-height:76vh;overflow:auto;padding:14px;border:1px solid #e4ebe8;border-radius:14px;background:#fff;box-shadow:0 18px 40px rgba(16,46,43,.18);display:none;z-index:9999}',
       '.auth-panel.open{display:block}',
-      '.auth-panel-title{margin:0 0 8px;font-size:13px;font-weight:700;color:#173a37}',
-      '.auth-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}',
-      '.auth-input{flex:1;height:34px;padding:0 9px;border:1px solid #ccd7d2;border-radius:8px;font-size:13px;min-width:170px}',
-      '.auth-form{display:grid;gap:8px;margin-top:8px}',
+      '.auth-panel-title{margin:0 0 10px;font-size:14px;font-weight:700;color:#173a37}',
+      '.auth-stack{display:grid;gap:8px}',
+      '.auth-input{width:100%;height:38px;padding:0 11px;border:1px solid #d3ddd9;border-radius:9px;font-size:13px}',
+      '.auth-input:focus{outline:none;border-color:#126b5f;box-shadow:0 0 0 3px rgba(18,107,95,.12)}',
+      '.auth-btnrow{display:grid;gap:8px;margin-top:10px}',
+      '.auth-btn{height:38px;border:1px solid #126b5f;background:#126b5f;color:#fff;border-radius:9px;padding:0 12px;font-size:13px;font-weight:700;cursor:pointer}',
+      '.auth-btn:hover{background:#0f5c52;border-color:#0f5c52}',
+      '.auth-btn.secondary{background:#fff;color:#144641;border-color:#c2d3ce}',
+      '.auth-btn.secondary:hover{background:#f3f9f7}',
+      '.auth-linkbtn{background:none;border:none;color:#0f5c52;font-size:12px;font-weight:600;cursor:pointer;padding:2px 0;text-align:left;justify-self:start}',
+      '.auth-linkbtn:hover{text-decoration:underline}',
+      '.auth-divider{margin:12px 0;border-top:1px solid #eef2f0}',
+      '.auth-form{display:grid;gap:10px}',
       '.auth-field{display:grid;gap:4px}',
-      '.auth-field label{font-size:11px;font-weight:700;color:#4b6160;text-transform:uppercase;letter-spacing:.6px}',
-      '.auth-field input{height:34px;border:1px solid #ccd7d2;border-radius:8px;padding:0 9px;font-size:13px;color:#1f2b2b}',
-      '.auth-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}',
-      '.auth-checks{display:grid;gap:6px;margin:3px 0}',
-      '.auth-check{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#365250;line-height:1.3}',
-      '.auth-check input{margin-top:1px}',
-      '.auth-password-box{display:grid;gap:8px;margin-top:8px;padding:8px;border:1px dashed #c8d8d3;border-radius:10px;background:#f9fcfb}',
-      '.auth-small{font-size:11px;color:#5a6f6e;margin:0}',
-      '.auth-status{margin:8px 0 0;font-size:12px;line-height:1.4;color:#3a5553}',
+      '.auth-field label{font-size:11px;font-weight:700;color:#4b6160;text-transform:uppercase;letter-spacing:.5px}',
+      '.auth-field input{height:36px;border:1px solid #d3ddd9;border-radius:9px;padding:0 10px;font-size:13px;color:#1f2b2b}',
+      '.auth-field input:focus{outline:none;border-color:#126b5f;box-shadow:0 0 0 3px rgba(18,107,95,.12)}',
+      '.auth-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}',
+      '.auth-checks{display:grid;gap:8px;margin:2px 0}',
+      '.auth-check{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#365250;line-height:1.35}',
+      '.auth-check input{margin-top:2px}',
+      '.auth-subtle{padding:10px;border:1px solid #e4ebe8;border-radius:10px;background:#f8fbfa}',
+      '.auth-small{font-size:11px;color:#5a6f6e;margin:0 0 8px}',
+      '.auth-status{margin:10px 0 0;font-size:12px;line-height:1.4;color:#3a5553}',
+      '.auth-status:empty{display:none}',
       '.auth-status.error{color:#8e3131}',
       '.auth-status.ok{color:#2f6a42}',
-      '@media (max-width:680px){.auth-grid{grid-template-columns:1fr}.auth-name{max-width:140px}.auth-btn{width:100%}}',
+      '@media (max-width:680px){.auth-grid{grid-template-columns:1fr}.auth-name{max-width:120px}}',
       '@media print{.auth-widget{display:none!important}}'
     ].join('');
     document.head.appendChild(style);
   }
+
+  const gearIcon = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2f4c49" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>';
 
   function createWidget() {
     const wrap = document.createElement('aside');
     wrap.className = 'auth-widget';
     wrap.innerHTML = [
       '<div class="auth-bar">',
-      '  <div class="auth-left">',
-      '    <button class="auth-btn secondary auth-icon-btn" id="auth-menu-toggle" type="button" title="Menu de conta">☰</button>',
-      '    <span class="auth-name" id="auth-name">Nao conectado</span>',
-      '  </div>',
-      '  <div class="auth-row" id="auth-right-actions">',
-      '    <button class="auth-btn secondary" id="auth-open-login" type="button">Entrar</button>',
-      '    <button class="auth-btn secondary" id="auth-logout" type="button" style="display:none">Sair</button>',
-      '  </div>',
+      '  <div class="auth-avatar" id="auth-avatar"></div>',
+      '  <span class="auth-name" id="auth-name"></span>',
+      '  <button class="auth-iconbtn" id="auth-menu-toggle" type="button" title="Configuracoes da conta" aria-label="Configuracoes da conta">' + gearIcon + '</button>',
+      '  <button class="auth-ghost" id="auth-logout" type="button" style="display:none">Sair</button>',
+      '  <button class="auth-primary" id="auth-open-login" type="button">Entrar</button>',
       '</div>',
       '<section class="auth-panel" id="auth-panel">',
       '  <div class="auth-logged-out" id="auth-logged-out">',
-      '    <p class="auth-panel-title">Acesso</p>',
-      '    <div class="auth-row">',
+      '    <p class="auth-panel-title">Acesse sua conta</p>',
+      '    <div class="auth-stack">',
       '      <input class="auth-input" id="auth-email" type="email" placeholder="Seu email" autocomplete="email"/>',
       '      <input class="auth-input" id="auth-password" type="password" placeholder="Sua senha" autocomplete="current-password"/>',
       '    </div>',
-      '    <div class="auth-row" style="margin-top:8px">',
+      '    <div class="auth-btnrow">',
       '      <button class="auth-btn" id="auth-login-password" type="button">Ja tenho conta</button>',
       '      <button class="auth-btn secondary" id="auth-signup-password" type="button">Primeiro acesso</button>',
-      '      <button class="auth-btn secondary" id="auth-reset-password" type="button">Esqueci/definir senha</button>',
+      '      <button class="auth-linkbtn" id="auth-reset-password" type="button">Esqueci / definir senha</button>',
       '    </div>',
       '  </div>',
       '  <div class="auth-logged-in" id="auth-logged-in" style="display:none">',
-      '    <p class="auth-panel-title">Configuracao do usuario</p>',
-      '    <div class="auth-password-box">',
+      '    <p class="auth-panel-title">Configuracao da conta</p>',
+      '    <div class="auth-subtle">',
       '      <p class="auth-small">Atualize sua senha quando quiser.</p>',
-      '      <div class="auth-row">',
+      '      <div class="auth-stack">',
       '        <input class="auth-input" id="auth-new-password" type="password" placeholder="Nova senha (minimo 6)" autocomplete="new-password"/>',
       '        <button class="auth-btn secondary" id="auth-set-password" type="button">Atualizar senha</button>',
       '      </div>',
       '    </div>',
+      '    <div class="auth-divider"></div>',
       '    <form class="auth-form" id="auth-profile-form">',
       '      <div class="auth-field">',
       '        <label for="profile-full-name">Nome completo</label>',
@@ -133,7 +145,7 @@
     const fallback = document.createElement('div');
     fallback.style.padding = '12px';
     fallback.style.display = 'flex';
-    fallback.style.justifyContent = 'center';
+    fallback.style.justifyContent = 'flex-end';
     fallback.appendChild(widget);
     document.body.prepend(fallback);
   }
@@ -145,6 +157,11 @@
 
   function onlyDigits(value) {
     return String(value || '').replace(/\D/g, '');
+  }
+
+  function initialsFromEmail(email) {
+    const base = (email || '').split('@')[0] || '?';
+    return base.slice(0, 2).toUpperCase();
   }
 
   async function sha256Hex(value) {
@@ -160,6 +177,7 @@
     const openLoginBtn = widget.querySelector('#auth-open-login');
     const logoutBtn = widget.querySelector('#auth-logout');
     const nameEl = widget.querySelector('#auth-name');
+    const avatarEl = widget.querySelector('#auth-avatar');
 
     const loggedOut = widget.querySelector('#auth-logged-out');
     const loggedIn = widget.querySelector('#auth-logged-in');
@@ -334,17 +352,23 @@
     function renderSession(session) {
       const user = session && session.user ? session.user : null;
       if (user) {
+        avatarEl.style.display = 'grid';
+        avatarEl.textContent = initialsFromEmail(user.email || user.id);
+        nameEl.style.display = 'inline';
         nameEl.textContent = user.email || user.id;
-        openLoginBtn.style.display = 'none';
+        toggleBtn.style.display = 'inline-flex';
         logoutBtn.style.display = 'inline-flex';
+        openLoginBtn.style.display = 'none';
         loggedOut.style.display = 'none';
         loggedIn.style.display = 'block';
-        setStatus(statusEl, 'Sessao ativa.', 'ok');
+        setStatus(statusEl, '', '');
         loadProfile(user.id);
       } else {
-        nameEl.textContent = 'Nao conectado';
-        openLoginBtn.style.display = 'inline-flex';
+        avatarEl.style.display = 'none';
+        nameEl.style.display = 'none';
+        toggleBtn.style.display = 'none';
         logoutBtn.style.display = 'none';
+        openLoginBtn.style.display = 'inline-flex';
         loggedOut.style.display = 'block';
         loggedIn.style.display = 'none';
         currentUserId = '';
@@ -357,8 +381,11 @@
     });
 
     openLoginBtn.addEventListener('click', function () {
-      setPanelOpen(true);
-      emailInput.focus();
+      const willOpen = !panel.classList.contains('open');
+      setPanelOpen(willOpen);
+      if (willOpen) {
+        emailInput.focus();
+      }
     });
 
     loginPasswordBtn.addEventListener('click', async function () {
@@ -404,7 +431,7 @@
           if (result.error) throw result.error;
 
           if (result.data && result.data.user && Array.isArray(result.data.user.identities) && result.data.user.identities.length === 0) {
-            setStatus(statusEl, 'Email ja cadastrado. Use "Ja tenho conta" ou "Esqueci/definir senha".', 'error');
+            setStatus(statusEl, 'Email ja cadastrado. Use "Ja tenho conta" ou "Esqueci / definir senha".', 'error');
           } else if (result.data && result.data.session) {
             setStatus(statusEl, 'Conta criada e login ativo.', 'ok');
             setPanelOpen(false);
@@ -466,7 +493,7 @@
       try {
         const result = await client.auth.signOut();
         if (result.error) throw result.error;
-        setStatus(statusEl, 'Sessao encerrada.', 'ok');
+        setPanelOpen(false);
       } catch (err) {
         setStatus(statusEl, 'Falha ao sair: ' + (err.message || 'erro desconhecido'), 'error');
       } finally {
