@@ -38,6 +38,7 @@
       '.auth-modal-close{width:34px;height:34px;border-radius:50%;border:1px solid #e0e8e5;background:#f7faf9;font-size:18px;line-height:1;color:#3a5652;cursor:pointer}',
       '.auth-modal-close:hover{background:#eef4f2}',
       '.auth-modal-body{padding:22px}',
+      '.auth-overlay form{display:block;margin:0;padding:0;grid-template-columns:none;gap:0}',
       '.auth-section-title{margin:0 0 12px;font-size:13px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#5c706d}',
       '.auth-section{margin-bottom:22px}',
       '.auth-section:last-child{margin-bottom:0}',
