@@ -35,6 +35,18 @@
       "imageDir": "Atos/At_1/img",
       "additionalStudyUrl": "https://drive.google.com/file/d/1UjmPvTefNTzwePmzRKvsOEgwNY7wjMDF/view?usp=drive_link",
       "layout": "v2"
+    },
+    {
+      "id": "mat_1_1_17",
+      "livro": "Mateus",
+      "capitulo": 1,
+      "versiculoInicio": 1,
+      "versiculoFim": 17,
+      "titulo": "Mateus 1:1-17",
+      "markdownPath": "Mateus/Mt_1/1_17.md",
+      "imageDir": "Mateus/Mt_1/img",
+      "additionalStudyUrl": "https://drive.google.com/file/d/1UjmPvTefNTzwePmzRKvsOEgwNY7wjMDF/view?usp=drive_link",
+      "layout": "v2"
     }
 
   ]
