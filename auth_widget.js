@@ -9,7 +9,7 @@
   function injectStyles() {
     const style = document.createElement('style');
     style.textContent = [
-      '.auth-widget{position:relative;display:inline-flex;justify-content:flex-end;font-family:Arial,Helvetica,sans-serif;color:#1f2b2b}',
+      '.auth-widget{position:fixed;top:12px;right:16px;z-index:10000;display:inline-flex;justify-content:flex-end;font-family:Arial,Helvetica,sans-serif;color:#1f2b2b}',
       '.auth-widget *{box-sizing:border-box}',
       '.auth-bar{display:inline-flex;align-items:center;gap:8px;padding:5px 6px;border:1px solid #e4ebe8;border-radius:999px;background:#fff;box-shadow:0 2px 8px rgba(16,46,43,.08)}',
       '.auth-avatar{width:30px;height:30px;border-radius:50%;background:#126b5f;color:#fff;display:none;place-items:center;font-size:12px;font-weight:700;flex:0 0 auto}',
@@ -20,7 +20,7 @@
       '.auth-ghost:hover{background:#f3f7f5}',
       '.auth-primary{height:32px;border:1px solid #126b5f;background:#126b5f;color:#fff;border-radius:999px;padding:0 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}',
       '.auth-primary:hover{background:#0f5c52;border-color:#0f5c52}',
-      '.auth-panel{position:absolute;right:0;top:calc(100% + 8px);width:min(360px,92vw);max-height:76vh;overflow:auto;padding:14px;border:1px solid #e4ebe8;border-radius:14px;background:#fff;box-shadow:0 18px 40px rgba(16,46,43,.18);display:none;z-index:9999}',
+      '.auth-panel{position:absolute;right:0;top:calc(100% + 8px);width:min(340px,calc(100vw - 32px));max-height:calc(100vh - 90px);overflow-y:auto;overflow-x:hidden;padding:14px;border:1px solid #e4ebe8;border-radius:14px;background:#fff;box-shadow:0 18px 40px rgba(16,46,43,.18);display:none;z-index:9999}',
       '.auth-panel.open{display:block}',
       '.auth-panel-title{margin:0 0 10px;font-size:14px;font-weight:700;color:#173a37}',
       '.auth-stack{display:grid;gap:8px}',
@@ -35,11 +35,11 @@
       '.auth-linkbtn:hover{text-decoration:underline}',
       '.auth-divider{margin:12px 0;border-top:1px solid #eef2f0}',
       '.auth-form{display:grid;gap:10px}',
-      '.auth-field{display:grid;gap:4px}',
+      '.auth-field{display:grid;gap:4px;min-width:0}',
       '.auth-field label{font-size:11px;font-weight:700;color:#4b6160;text-transform:uppercase;letter-spacing:.5px}',
-      '.auth-field input{height:36px;border:1px solid #d3ddd9;border-radius:9px;padding:0 10px;font-size:13px;color:#1f2b2b}',
+      '.auth-field input{width:100%;min-width:0;height:36px;border:1px solid #d3ddd9;border-radius:9px;padding:0 10px;font-size:13px;color:#1f2b2b}',
       '.auth-field input:focus{outline:none;border-color:#126b5f;box-shadow:0 0 0 3px rgba(18,107,95,.12)}',
-      '.auth-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}',
+      '.auth-grid{display:grid;grid-template-columns:1fr;gap:10px}',
       '.auth-checks{display:grid;gap:8px;margin:2px 0}',
       '.auth-check{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#365250;line-height:1.35}',
       '.auth-check input{margin-top:2px}',
