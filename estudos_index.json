@@ -37,6 +37,18 @@
       "layout": "v2"
     },
     {
+      "id": "atos_1_15_26",
+      "livro": "Atos",
+      "capitulo": 1,
+      "versiculoInicio": 15,
+      "versiculoFim": 26,
+      "titulo": "Atos 1:15-26",
+      "markdownPath": "Atos/At_1/15_26.md",
+      "imageDir": "Atos/At_1/img",
+      "additionalStudyUrl": "https://drive.google.com/file/d/1UjmPvTefNTzwePmzRKvsOEgwNY7wjMDF/view?usp=drive_link",
+      "layout": "v2"
+    },
+    {
       "id": "mat_1_1_17",
       "livro": "Mateus",
       "capitulo": 1,
