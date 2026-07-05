@@ -783,11 +783,39 @@
         renderImages(title, imageNames);
         updatePrevNextLinks();
         updateCrossLinks();
+        balanceScriptureFonts();
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(balanceScriptureFonts);
+        }
         setStatus('Estudo carregado com sucesso a partir de ' + resolvedMdPath + '.', false);
       } catch (error) {
         setStatus('Erro ao carregar estudo: ' + error.message + '. Abra via servidor local no VS Code.', true);
       }
     }
+
+    function balanceScriptureFonts() {
+      const ids = ['nvi-content', 'naa-content', 'nlt-content'];
+      const els = ids.map(function (id) { return document.getElementById(id); });
+      if (els.some(function (el) { return !el; })) {
+        return;
+      }
+
+      // Reinicia para a fonte base do CSS antes de medir.
+      els.forEach(function (el) { el.style.fontSize = ''; });
+
+      const target = Math.max(els[0].scrollHeight, els[1].scrollHeight);
+      const nltEl = els[2];
+      let size = 15;
+      const minSize = 10.5;
+      const step = 0.5;
+
+      while (nltEl.scrollHeight > target + 2 && size > minSize) {
+        size -= step;
+        nltEl.style.fontSize = size.toFixed(1) + 'px';
+      }
+    }
+
+    window.addEventListener('resize', balanceScriptureFonts);
 
     renderFromMarkdown();
   </script>
