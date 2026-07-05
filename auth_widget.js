@@ -1,8 +1,10 @@
 (function () {
   const config = window.BIBLIA_SUPABASE_CONFIG || {};
   const hasConfig = Boolean(config.url && config.anonKey);
+  const ADMIN_ACCESS_EMAIL = 'rodrigo.lara@rede.ulbra.br';
 
   let currentUserId = '';
+  let currentUserEmail = '';
   let acceptedTermsAt = null;
   let acceptedPrivacyAt = null;
 
@@ -28,10 +30,13 @@
       '.app-menu-item .ic{width:18px;height:18px;flex:0 0 auto}',
       '.app-menu-item.danger{color:#8e3131}',
       '.app-menu-item.danger:hover{background:#fbeeee}',
+      '.app-menu-item.admin{color:#5a4a12}',
+      '.app-menu-item.admin:hover{background:#fbf4df}',
       /* Overlay + Modal */
       '.auth-overlay{position:fixed;inset:0;background:rgba(15,30,28,.55);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;z-index:10001;overflow:auto}',
       '.auth-overlay.open{display:flex}',
       '.auth-modal{width:100%;max-width:680px;background:#fff;border-radius:16px;box-shadow:0 30px 70px rgba(10,28,26,.35);overflow:hidden;animation:authpop .18s ease}',
+      '.auth-modal.wide{max-width:920px}',
       '@keyframes authpop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}',
       '.auth-modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #eef2f0}',
       '.auth-modal-head h2{margin:0;font-size:18px;color:#153a36}',
@@ -70,7 +75,26 @@
       '.auth-status:empty{display:none}',
       '.auth-status.error{color:#8e3131}',
       '.auth-status.ok{color:#2f6a42}',
-      '@media (max-width:640px){.form-grid{grid-template-columns:1fr}.check-grid{grid-template-columns:1fr}.app-menu-caption{display:none}}',
+      '.analytics-toolbar{display:flex;align-items:end;gap:12px;flex-wrap:wrap;margin-bottom:16px}',
+      '.analytics-filter{display:grid;gap:6px;min-width:150px;font-size:12px;font-weight:700;color:#4b6160}',
+      '.analytics-filter span{text-transform:uppercase;letter-spacing:.5px}',
+      '.analytics-filter select,.analytics-filter input{height:40px;border:1px solid #d3ddd9;border-radius:10px;padding:0 10px;font:inherit;background:#fff;color:#1f2b2b}',
+      '.analytics-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}',
+      '.analytics-metric{border:1px solid #dce5e2;border-radius:12px;padding:12px;background:#f9fcfb}',
+      '.analytics-metric small{display:block;color:#6a7f7b;font-size:11px;text-transform:uppercase;letter-spacing:.6px;font-weight:700}',
+      '.analytics-metric strong{display:block;margin-top:6px;font-size:22px;color:#17322f}',
+      '.analytics-table{width:100%;border-collapse:collapse}',
+      '.analytics-table th,.analytics-table td{padding:10px 8px;border-bottom:1px solid #edf1ef;text-align:left;font-size:13px;vertical-align:top}',
+      '.analytics-table th{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:#6a7f7b;background:#fbfdfc}',
+      '.analytics-panel{display:grid;gap:18px}',
+      '.analytics-section{border:1px solid #e3e9e6;border-radius:14px;overflow:hidden}',
+      '.analytics-section h3{margin:0;padding:12px 14px;background:#f7fbfa;border-bottom:1px solid #e3e9e6;font-size:14px;color:#21413d}',
+      '.analytics-section .body{padding:0 14px 14px}',
+      '.analytics-empty{padding:12px 0;color:#6f807d;font-size:14px}',
+      '.analytics-loading{padding:16px 0;color:#6f807d;font-size:14px}',
+      '@media (max-width:640px){.form-grid{grid-template-columns:1fr}.check-grid{grid-template-columns:1fr}.app-menu-caption{display:none}.analytics-toolbar{align-items:stretch}.analytics-filter{min-width:0;flex:1 1 100%}.analytics-toolbar .btn{width:100%}}',
+      '@media (max-width:840px){.analytics-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}',
+      '@media (max-width:560px){.analytics-summary{grid-template-columns:1fr}}',
       '@media print{.app-menu,.auth-overlay{display:none!important}}'
     ].join('');
     document.head.appendChild(style);
@@ -91,6 +115,7 @@
       '    <strong id="app-menu-username"></strong>',
       '  </div>',
       '  <button class="app-menu-item" id="menu-login" type="button">Entrar</button>',
+      '  <button class="app-menu-item admin" id="menu-analytics" type="button" style="display:none">Painel de acessos</button>',
       '  <button class="app-menu-item" id="menu-account" type="button" style="display:none">Minha conta</button>',
       '  <button class="app-menu-item danger" id="menu-logout" type="button" style="display:none">Sair</button>',
       '</div>'
@@ -219,6 +244,30 @@
     return overlay;
   }
 
+  function createAnalyticsModal() {
+    const overlay = document.createElement('div');
+    overlay.className = 'auth-overlay';
+    overlay.id = 'analytics-overlay';
+    overlay.innerHTML = [
+      '<div class="auth-modal wide" role="dialog" aria-modal="true" aria-label="Painel de acessos">',
+      '  <div class="auth-modal-head">',
+      '    <h2>Painel de acessos</h2>',
+      '    <button class="auth-modal-close" data-close="analytics" type="button" aria-label="Fechar">&times;</button>',
+      '  </div>',
+      '  <div class="auth-modal-body">',
+      '    <div class="analytics-panel" id="analytics-content">',
+      '      <div class="analytics-loading">Carregando dados...</div>',
+      '    </div>',
+      '    <p class="auth-status" id="analytics-status"></p>',
+      '  </div>',
+      '  <div class="auth-modal-foot">',
+      '    <button class="btn secondary" data-close="analytics" type="button">Fechar</button>',
+      '  </div>',
+      '</div>'
+    ].join('');
+    return overlay;
+  }
+
   function setStatus(el, message, type) {
     if (!el) return;
     el.textContent = message || '';
@@ -234,6 +283,10 @@
     return base.slice(0, 2).toUpperCase();
   }
 
+  function isAdminAccessEmail(email) {
+    return String(email || '').trim().toLowerCase() === ADMIN_ACCESS_EMAIL;
+  }
+
   async function sha256Hex(value) {
     const enc = new TextEncoder();
     const data = enc.encode(value);
@@ -244,8 +297,8 @@
   function boot(client, refs) {
     const {
       menu, menuBtn, menuPanel, avatarEl, captionEl, userLine, userNameEl,
-      menuLogin, menuAccount, menuLogout,
-      loginOverlay, accountOverlay
+      menuLogin, menuAnalytics, menuAccount, menuLogout,
+      loginOverlay, accountOverlay, analyticsOverlay
     } = refs;
 
     const loginEmail = loginOverlay.querySelector('#login-email');
@@ -281,6 +334,10 @@
     const photoUploadBtn = accountOverlay.querySelector('#acc-photo-upload-btn');
     const photoCameraBtn = accountOverlay.querySelector('#acc-photo-camera-btn');
     const photoStatus = accountOverlay.querySelector('#acc-photo-status');
+    const analyticsRange = analyticsOverlay.querySelector('#analytics-range');
+    const analyticsFrom = analyticsOverlay.querySelector('#analytics-from');
+    const analyticsTo = analyticsOverlay.querySelector('#analytics-to');
+    const analyticsRefresh = analyticsOverlay.querySelector('#analytics-refresh');
 
     function setAvatarPreview(url) {
       if (url) {
@@ -485,6 +542,7 @@
     function renderSession(session) {
       const user = session && session.user ? session.user : null;
       if (user) {
+        currentUserEmail = user.email || '';
         avatarEl.style.display = 'grid';
         menuInitials = initialsFromEmail(user.email || user.id);
         setMenuAvatar('');
@@ -492,18 +550,244 @@
         userLine.style.display = 'block';
         userNameEl.textContent = user.email || user.id;
         menuLogin.style.display = 'none';
+        menuAnalytics.style.display = isAdminAccessEmail(user.email) ? 'flex' : 'none';
         menuAccount.style.display = 'flex';
         menuLogout.style.display = 'flex';
         loadProfile(user.id);
       } else {
+        currentUserEmail = '';
         avatarEl.style.display = 'none';
         captionEl.textContent = 'Menu';
         userLine.style.display = 'none';
         userNameEl.textContent = '';
         menuLogin.style.display = 'flex';
+        menuAnalytics.style.display = 'none';
         menuAccount.style.display = 'none';
         menuLogout.style.display = 'none';
         currentUserId = '';
+      }
+    }
+
+    function syncAnalyticsFilters() {
+      const custom = analyticsRange && analyticsRange.value === 'custom';
+      [analyticsFrom, analyticsTo].forEach(function (el) {
+        if (!el) return;
+        const wrapper = el.closest('.analytics-custom');
+        if (wrapper) {
+          wrapper.style.display = custom ? 'grid' : 'none';
+        }
+      });
+    }
+
+    async function loadAnalyticsData() {
+      const statusEl = document.getElementById('analytics-status');
+      const contentEl = document.getElementById('analytics-content');
+      if (!statusEl || !contentEl) return;
+
+      if (!currentUserId || !isAdminAccessEmail(currentUserEmail)) {
+        statusEl.textContent = 'Painel restrito a conta administradora.';
+        contentEl.innerHTML = '<div class="analytics-empty">Acesso restrito.</div>';
+        return;
+      }
+
+      if (!client) {
+        statusEl.textContent = 'Supabase indisponivel.';
+        contentEl.innerHTML = '<div class="analytics-empty">Nao foi possivel carregar dados.</div>';
+        return;
+      }
+
+      const rangeValue = analyticsRange ? analyticsRange.value : '7';
+      const today = new Date();
+      const toIsoDate = function (date) { return date.toISOString().slice(0, 10); };
+      const parseDateInput = function (value) { return value ? new Date(value + 'T00:00:00') : null; };
+      let startDate = null;
+      let endDate = null;
+
+      if (rangeValue === 'today') {
+        startDate = new Date(today);
+        endDate = new Date(today);
+      } else if (rangeValue === '30') {
+        endDate = new Date(today);
+        startDate = new Date(today);
+        startDate.setDate(startDate.getDate() - 29);
+      } else if (rangeValue === 'custom') {
+        startDate = parseDateInput(analyticsFrom ? analyticsFrom.value : '');
+        endDate = parseDateInput(analyticsTo ? analyticsTo.value : '');
+        if (!startDate || !endDate) {
+          statusEl.textContent = 'Escolha a data inicial e final para o periodo personalizado.';
+          contentEl.innerHTML = '<div class="analytics-empty">Informe um intervalo valido.</div>';
+          return;
+        }
+      } else {
+        endDate = new Date(today);
+        startDate = new Date(today);
+        startDate.setDate(startDate.getDate() - 6);
+      }
+
+      if (startDate) startDate.setHours(0, 0, 0, 0);
+      if (endDate) endDate.setHours(23, 59, 59, 999);
+
+      const startIso = startDate ? toIsoDate(startDate) : null;
+      const endIso = endDate ? toIsoDate(endDate) : null;
+
+      statusEl.textContent = '';
+      contentEl.innerHTML = '<div class="analytics-loading">Carregando dados...</div>';
+
+      try {
+        let query = client
+          .from('site_access_logs')
+          .select('occurred_at, access_day, event_type, visitor_id, user_id, study_id, study_title, study_ref')
+          .order('occurred_at', { ascending: false });
+
+        if (startIso) query = query.gte('access_day', startIso);
+        if (endIso) query = query.lte('access_day', endIso);
+
+        const logsRes = await query;
+        if (logsRes.error) throw logsRes.error;
+
+        const dailyMap = new Map();
+        const studyMap = new Map();
+
+        (logsRes.data || []).forEach(function (row) {
+          const day = row.access_day || (row.occurred_at ? String(row.occurred_at).slice(0, 10) : '');
+          const dayEntry = dailyMap.get(day) || {
+            access_day: day,
+            total_events: 0,
+            page_views: 0,
+            study_views: 0,
+            study_searches: 0,
+            visitors: new Set(),
+            loggedUsers: new Set(),
+            studies: new Set()
+          };
+
+          dayEntry.total_events += 1;
+          if (row.event_type === 'page_view') dayEntry.page_views += 1;
+          if (row.event_type === 'study_view') dayEntry.study_views += 1;
+          if (row.event_type === 'study_search') dayEntry.study_searches += 1;
+          if (row.visitor_id) dayEntry.visitors.add(row.visitor_id);
+          if (row.user_id) dayEntry.loggedUsers.add(row.user_id);
+          if (row.study_id) dayEntry.studies.add(row.study_id);
+          dailyMap.set(day, dayEntry);
+
+          if (row.study_id) {
+            const studyEntry = studyMap.get(row.study_id) || {
+              access_day: day,
+              study_id: row.study_id,
+              study_title: row.study_title || '',
+              study_ref: row.study_ref || '',
+              total_events: 0,
+              study_views: 0,
+              visitors: new Set()
+            };
+            studyEntry.total_events += 1;
+            if (row.event_type === 'study_view') studyEntry.study_views += 1;
+            if (row.visitor_id) studyEntry.visitors.add(row.visitor_id);
+            if (!studyEntry.study_title && row.study_title) studyEntry.study_title = row.study_title;
+            if (!studyEntry.study_ref && row.study_ref) studyEntry.study_ref = row.study_ref;
+            if (!studyEntry.access_day || day > studyEntry.access_day) studyEntry.access_day = day;
+            studyMap.set(row.study_id, studyEntry);
+          }
+        });
+
+        const daily = Array.from(dailyMap.values())
+          .map(function (row) {
+            return {
+              access_day: row.access_day,
+              total_events: row.total_events,
+              page_views: row.page_views,
+              study_views: row.study_views,
+              study_searches: row.study_searches,
+              unique_visitors: row.visitors.size,
+              unique_logged_users: row.loggedUsers.size,
+              distinct_studies: row.studies.size
+            };
+          })
+          .sort(function (a, b) { return String(b.access_day).localeCompare(String(a.access_day)); });
+
+        const studies = Array.from(studyMap.values())
+          .map(function (row) {
+            return {
+              access_day: row.access_day,
+              study_id: row.study_id,
+              study_title: row.study_title,
+              study_ref: row.study_ref,
+              total_events: row.total_events,
+              unique_visitors: row.visitors.size,
+              study_views: row.study_views
+            };
+          })
+          .sort(function (a, b) {
+            if (b.total_events !== a.total_events) return b.total_events - a.total_events;
+            return String(a.study_ref || '').localeCompare(String(b.study_ref || ''));
+          });
+
+        const latest = daily[0] || {};
+        const topStudy = studies[0] || {};
+
+        const summaryHtml = [
+          '<div class="analytics-summary">',
+          '  <div class="analytics-metric"><small>Hoje</small><strong>' + (latest.total_events || 0) + '</strong></div>',
+          '  <div class="analytics-metric"><small>Visitantes unicos</small><strong>' + (latest.unique_visitors || 0) + '</strong></div>',
+          '  <div class="analytics-metric"><small>Usuarios logados</small><strong>' + (latest.unique_logged_users || 0) + '</strong></div>',
+          '  <div class="analytics-metric"><small>Top estudo</small><strong>' + (topStudy.study_ref || topStudy.study_id || '-') + '</strong></div>',
+          '</div>'
+        ].join('');
+
+        const dailyRows = daily.length
+          ? daily.map(function (row) {
+              return '<tr>' +
+                '<td>' + row.access_day + '</td>' +
+                '<td>' + (row.total_events || 0) + '</td>' +
+                '<td>' + (row.page_views || 0) + '</td>' +
+                '<td>' + (row.study_views || 0) + '</td>' +
+                '<td>' + (row.study_searches || 0) + '</td>' +
+                '<td>' + (row.unique_visitors || 0) + '</td>' +
+                '<td>' + (row.unique_logged_users || 0) + '</td>' +
+                '</tr>';
+            }).join('')
+          : '<tr><td colspan="7"><div class="analytics-empty">Sem dados ainda.</div></td></tr>';
+
+        const studyRows = studies.length
+          ? studies.map(function (row) {
+              return '<tr>' +
+                '<td>' + row.access_day + '</td>' +
+                '<td>' + (row.study_ref || row.study_id || '-') + '</td>' +
+                '<td>' + (row.study_title || '-') + '</td>' +
+                '<td>' + (row.total_events || 0) + '</td>' +
+                '<td>' + (row.unique_visitors || 0) + '</td>' +
+                '<td>' + (row.study_views || 0) + '</td>' +
+                '</tr>';
+            }).join('')
+          : '<tr><td colspan="6"><div class="analytics-empty">Sem dados por estudo ainda.</div></td></tr>';
+
+        contentEl.innerHTML = summaryHtml +
+          '<div class="analytics-section">' +
+            '<h3>Filtros ativos</h3>' +
+            '<div class="body">' +
+              '<div class="analytics-empty">' + (startIso && endIso ? (startIso + ' ate ' + endIso) : 'Periodo recente') + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="analytics-section">' +
+            '<h3>Resumo diario</h3>' +
+            '<div class="body">' +
+              '<table class="analytics-table">' +
+                '<thead><tr><th>Dia</th><th>Total</th><th>Paginas</th><th>Estudos</th><th>Buscas</th><th>Visitantes</th><th>Logados</th></tr></thead>' +
+                '<tbody>' + dailyRows + '</tbody>' +
+              '</table>' +
+            '</div>' +
+          '</div>' +
+          '<div class="analytics-section">' +
+            '<h3>Estudos mais acessados</h3>' +
+            '<div class="body">' +
+              '<table class="analytics-table">' +
+                '<thead><tr><th>Dia</th><th>Referencia</th><th>Titulo</th><th>Eventos</th><th>Visitantes</th><th>Visualizacoes</th></tr></thead>' +
+                '<tbody>' + studyRows + '</tbody>' +
+              '</table>' +
+            '</div>' +
+          '</div>';
+      } catch (err) {
+        contentEl.innerHTML = '<div class="analytics-empty">Falha ao carregar dados: ' + (err.message || 'erro desconhecido') + '</div>';
       }
     }
 
@@ -532,6 +816,14 @@
       openOverlay(accountOverlay);
     });
 
+    menuAnalytics.addEventListener('click', function () {
+      setMenuOpen(false);
+      setStatus(document.getElementById('analytics-status'), '', '');
+      syncAnalyticsFilters();
+      openOverlay(analyticsOverlay);
+      loadAnalyticsData();
+    });
+
     menuLogout.addEventListener('click', async function () {
       setMenuOpen(false);
       try {
@@ -555,10 +847,34 @@
       });
     });
 
+    analyticsOverlay.addEventListener('click', function (event) {
+      if (event.target === analyticsOverlay) {
+        closeOverlay(analyticsOverlay);
+      }
+    });
+    analyticsOverlay.querySelectorAll('[data-close]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        closeOverlay(analyticsOverlay);
+      });
+    });
+
+    if (analyticsRange) {
+      analyticsRange.addEventListener('change', function () {
+        syncAnalyticsFilters();
+      });
+    }
+    if (analyticsRefresh) {
+      analyticsRefresh.addEventListener('click', function () {
+        syncAnalyticsFilters();
+        loadAnalyticsData();
+      });
+    }
+
     document.addEventListener('keydown', function (event) {
       if (event.key === 'Escape') {
         closeOverlay(loginOverlay);
         closeOverlay(accountOverlay);
+        closeOverlay(analyticsOverlay);
         setMenuOpen(false);
       }
     });
@@ -685,8 +1001,10 @@
 
     const loginOverlay = createLoginModal();
     const accountOverlay = createAccountModal();
+    const analyticsOverlay = createAnalyticsModal();
     document.body.appendChild(loginOverlay);
     document.body.appendChild(accountOverlay);
+    document.body.appendChild(analyticsOverlay);
 
     const refs = {
       menu: menu,
@@ -697,10 +1015,12 @@
       userLine: menu.querySelector('#app-menu-userline'),
       userNameEl: menu.querySelector('#app-menu-username'),
       menuLogin: menu.querySelector('#menu-login'),
+      menuAnalytics: menu.querySelector('#menu-analytics'),
       menuAccount: menu.querySelector('#menu-account'),
       menuLogout: menu.querySelector('#menu-logout'),
       loginOverlay: loginOverlay,
-      accountOverlay: accountOverlay
+      accountOverlay: accountOverlay,
+      analyticsOverlay: analyticsOverlay
     };
 
     if (!window.supabase || !window.supabase.createClient) {

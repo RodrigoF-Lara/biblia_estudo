@@ -38,6 +38,8 @@ No painel: SQL Editor
    - tabela study_completions (progresso de estudos: estrela de concluido)
    - tabela study_comments (comentarios e oracoes por estudo)
    - bucket "study-audio" (Storage) para audio de comentarios/oracoes
+   - tabela site_access_logs (log de acesso do site, inclusive visitantes anonimos)
+   - views site_access_daily_summary e site_access_by_study_daily para analise rapida
 
 ## 4) Tornar seu usuario admin
 Depois do seu primeiro login: 
@@ -70,3 +72,5 @@ on conflict (user_id) do nothing;
 - A anon key pode ficar no frontend.
 - Se o link do email abrir e nao logar, quase sempre falta ajustar Redirect URLs.
 - CPF e salvo em user_private_data.cpf conforme a regra atual solicitada no projeto.
+- O site registra visitas anonimas com visitor_id local no navegador, sem exigir conta.
+- Para ver numeros por dia, use as views site_access_daily_summary e site_access_by_study_daily.

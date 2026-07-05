@@ -802,6 +802,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="auth_widget.js"></script>
+  <script src="analytics_logger.js"></script>
 
   <script>
     const params = new URLSearchParams(window.location.search);
@@ -1483,6 +1484,25 @@
         studyPublicId = (resolvedStudy && resolvedStudy.id)
           ? resolvedStudy.id
           : ('md:' + resolvedMdPath.replace(/\\/g, '/'));
+        if (window.BibliaEstudoAnalytics) {
+          window.BibliaEstudoAnalytics.configure({
+            client: supabaseClient,
+            pagePath: window.location.pathname,
+            getCurrentUser: function () { return currentSessionUser; }
+          });
+          window.BibliaEstudoAnalytics.trackPageView({
+            studyId: studyPublicId,
+            studyTitle: title,
+            studyRef: resolvedStudy
+              ? (resolvedStudy.livro + ' ' + resolvedStudy.capitulo + ':' + resolvedStudy.versiculoInicio + '-' + resolvedStudy.versiculoFim)
+              : title,
+            metadata: {
+              page: 'layout_novo',
+              markdownPath: resolvedMdPath,
+              imageCount: imageNames.length
+            }
+          });
+        }
         updatePrevNextLinks();
         updateCrossLinks();
         balanceScriptureFonts();

@@ -511,3 +511,82 @@ using (
     )
   )
 );
+
+-- Log de acesso ao site e aos estudos (inclui visitantes anonimos)
+create table if not exists public.site_access_logs (
+  id uuid primary key default gen_random_uuid(),
+  occurred_at timestamptz not null default now(),
+  access_day date not null default current_date,
+  event_type text not null,
+  page_path text not null,
+  visitor_id text not null,
+  session_id text not null,
+  user_id uuid references auth.users(id) on delete set null,
+  user_email text,
+  study_id text,
+  study_title text,
+  study_ref text,
+  metadata jsonb not null default '{}'::jsonb
+);
+
+create index if not exists site_access_logs_access_day_idx
+  on public.site_access_logs (access_day);
+
+create index if not exists site_access_logs_event_type_idx
+  on public.site_access_logs (event_type);
+
+create index if not exists site_access_logs_study_id_idx
+  on public.site_access_logs (study_id);
+
+create index if not exists site_access_logs_visitor_id_idx
+  on public.site_access_logs (visitor_id);
+
+alter table public.site_access_logs enable row level security;
+
+drop policy if exists "site_access_logs_insert_public" on public.site_access_logs;
+create policy "site_access_logs_insert_public"
+on public.site_access_logs
+for insert
+to anon, authenticated
+with check (true);
+
+drop policy if exists "site_access_logs_select_admin" on public.site_access_logs;
+create policy "site_access_logs_select_admin"
+on public.site_access_logs
+for select
+using (
+  lower(coalesce(auth.jwt() ->> 'email', '')) = 'rodrigo.lara@rede.ulbra.br'
+  or exists (
+    select 1
+    from public.admin_users a
+    where a.user_id = auth.uid()
+  )
+);
+
+create or replace view public.site_access_daily_summary as
+select
+  access_day,
+  count(*) as total_events,
+  count(*) filter (where event_type = 'page_view') as page_views,
+  count(*) filter (where event_type = 'study_view') as study_views,
+  count(*) filter (where event_type = 'study_search') as study_searches,
+  count(distinct visitor_id) as unique_visitors,
+  count(distinct user_id) filter (where user_id is not null) as unique_logged_users,
+  count(distinct study_id) filter (where study_id is not null) as distinct_studies
+from public.site_access_logs
+group by access_day
+order by access_day desc;
+
+create or replace view public.site_access_by_study_daily as
+select
+  access_day,
+  study_id,
+  max(study_title) as study_title,
+  max(study_ref) as study_ref,
+  count(*) as total_events,
+  count(distinct visitor_id) as unique_visitors,
+  count(*) filter (where event_type = 'study_view') as study_views
+from public.site_access_logs
+where study_id is not null
+group by access_day, study_id
+order by access_day desc, total_events desc;

@@ -264,6 +264,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="auth_widget.js"></script>
+  <script src="analytics_logger.js"></script>
 
   <script>
     let estudos = [];
@@ -291,6 +292,16 @@
       popularLivros();
       await refreshCompletions();
       renderListaEstudos();
+      if (window.BibliaEstudoAnalytics) {
+        window.BibliaEstudoAnalytics.configure({
+          client: supaClient,
+          pagePath: window.location.pathname,
+          getCurrentUser: function () { return currentUser; }
+        });
+        window.BibliaEstudoAnalytics.trackPageView({
+          metadata: { page: 'busca_estudo', total_studies: estudos.length }
+        });
+      }
     }
 
     async function refreshCompletions() {
@@ -463,12 +474,35 @@
 
       const estudo = buscarEstudo(livro, capitulo, versiculo);
       if (!estudo) {
+        if (window.BibliaEstudoAnalytics) {
+          window.BibliaEstudoAnalytics.trackEvent('study_search', {
+            metadata: {
+              livro: livro,
+              capitulo: capitulo,
+              versiculo: versiculo,
+              found: false
+            }
+          });
+        }
         mostrarNaoEncontrado(livro, capitulo, versiculo);
         return;
       }
 
       const resultado = document.getElementById('resultado');
       resultado.innerHTML = 'Abrindo <strong>' + estudo.titulo + '</strong>...';
+      if (window.BibliaEstudoAnalytics) {
+        window.BibliaEstudoAnalytics.trackEvent('study_search', {
+          studyId: estudo.id,
+          studyTitle: estudo.titulo,
+          studyRef: estudo.livro + ' ' + estudo.capitulo + ':' + estudo.versiculoInicio + '-' + estudo.versiculoFim,
+          metadata: {
+            livro: livro,
+            capitulo: capitulo,
+            versiculo: versiculo,
+            found: true
+          }
+        });
+      }
       window.location.href = buildStudyHref(estudo);
     });
 
