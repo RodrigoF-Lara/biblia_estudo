@@ -9,148 +9,203 @@
   function injectStyles() {
     const style = document.createElement('style');
     style.textContent = [
-      '.auth-widget{position:fixed;top:12px;right:16px;z-index:10000;display:inline-flex;justify-content:flex-end;font-family:Arial,Helvetica,sans-serif;color:#1f2b2b}',
-      '.auth-widget *{box-sizing:border-box}',
-      '.auth-bar{display:inline-flex;align-items:center;gap:8px;padding:5px 6px;border:1px solid #e4ebe8;border-radius:999px;background:#fff;box-shadow:0 2px 8px rgba(16,46,43,.08)}',
-      '.auth-avatar{width:30px;height:30px;border-radius:50%;background:#126b5f;color:#fff;display:none;place-items:center;font-size:12px;font-weight:700;flex:0 0 auto}',
-      '.auth-name{font-size:13px;font-weight:600;color:#243b39;max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 2px;display:none}',
-      '.auth-iconbtn{width:32px;height:32px;border-radius:50%;border:1px solid #dce6e2;background:#f6faf9;cursor:pointer;display:none;align-items:center;justify-content:center;padding:0}',
-      '.auth-iconbtn:hover{background:#eef5f2}',
-      '.auth-ghost{height:32px;border:1px solid #dce6e2;background:#fff;color:#2f4c49;border-radius:999px;padding:0 14px;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}',
-      '.auth-ghost:hover{background:#f3f7f5}',
-      '.auth-primary{height:32px;border:1px solid #126b5f;background:#126b5f;color:#fff;border-radius:999px;padding:0 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}',
-      '.auth-primary:hover{background:#0f5c52;border-color:#0f5c52}',
-      '.auth-panel{position:absolute;right:0;top:calc(100% + 8px);width:min(340px,calc(100vw - 32px));max-height:calc(100vh - 90px);overflow-y:auto;overflow-x:hidden;padding:14px;border:1px solid #e4ebe8;border-radius:14px;background:#fff;box-shadow:0 18px 40px rgba(16,46,43,.18);display:none;z-index:9999}',
-      '.auth-panel.open{display:block}',
-      '.auth-panel-title{margin:0 0 10px;font-size:14px;font-weight:700;color:#173a37}',
-      '.auth-stack{display:grid;gap:8px}',
-      '.auth-input{width:100%;height:38px;padding:0 11px;border:1px solid #d3ddd9;border-radius:9px;font-size:13px}',
-      '.auth-input:focus{outline:none;border-color:#126b5f;box-shadow:0 0 0 3px rgba(18,107,95,.12)}',
-      '.auth-btnrow{display:grid;gap:8px;margin-top:10px}',
-      '.auth-btn{height:38px;border:1px solid #126b5f;background:#126b5f;color:#fff;border-radius:9px;padding:0 12px;font-size:13px;font-weight:700;cursor:pointer}',
-      '.auth-btn:hover{background:#0f5c52;border-color:#0f5c52}',
-      '.auth-btn.secondary{background:#fff;color:#144641;border-color:#c2d3ce}',
-      '.auth-btn.secondary:hover{background:#f3f9f7}',
-      '.auth-linkbtn{background:none;border:none;color:#0f5c52;font-size:12px;font-weight:600;cursor:pointer;padding:2px 0;text-align:left;justify-self:start}',
-      '.auth-linkbtn:hover{text-decoration:underline}',
-      '.auth-divider{margin:12px 0;border-top:1px solid #eef2f0}',
-      '.auth-form{display:grid;gap:10px}',
-      '.auth-field{display:grid;gap:4px;min-width:0}',
-      '.auth-field label{font-size:11px;font-weight:700;color:#4b6160;text-transform:uppercase;letter-spacing:.5px}',
-      '.auth-field input{width:100%;min-width:0;height:36px;border:1px solid #d3ddd9;border-radius:9px;padding:0 10px;font-size:13px;color:#1f2b2b}',
-      '.auth-field input:focus{outline:none;border-color:#126b5f;box-shadow:0 0 0 3px rgba(18,107,95,.12)}',
-      '.auth-grid{display:grid;grid-template-columns:1fr;gap:10px}',
-      '.auth-checks{display:grid;gap:8px;margin:2px 0}',
-      '.auth-check{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#365250;line-height:1.35}',
-      '.auth-check input{margin-top:2px}',
-      '.auth-subtle{padding:10px;border:1px solid #e4ebe8;border-radius:10px;background:#f8fbfa}',
-      '.auth-small{font-size:11px;color:#5a6f6e;margin:0 0 8px}',
-      '.auth-status{margin:10px 0 0;font-size:12px;line-height:1.4;color:#3a5553}',
+      /* Menu hamburguer fixo (topo direito) */
+      '.app-menu{position:fixed;top:12px;right:16px;z-index:10000;font-family:Arial,Helvetica,sans-serif}',
+      '.app-menu *{box-sizing:border-box}',
+      '.app-menu-btn{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 10px 0 8px;border:1px solid #e4ebe8;border-radius:999px;background:#fff;box-shadow:0 4px 14px rgba(16,46,43,.12);cursor:pointer}',
+      '.app-menu-btn:hover{background:#f7faf9}',
+      '.app-menu-lines{display:grid;gap:3px;width:18px}',
+      '.app-menu-lines span{height:2px;background:#2f4c49;border-radius:2px;display:block}',
+      '.app-avatar{width:30px;height:30px;border-radius:50%;background:#126b5f;color:#fff;display:none;place-items:center;font-size:12px;font-weight:700}',
+      '.app-menu-caption{font-size:13px;font-weight:600;color:#243b39;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '.app-menu-panel{position:absolute;right:0;top:calc(100% + 8px);width:250px;background:#fff;border:1px solid #e4ebe8;border-radius:12px;box-shadow:0 18px 40px rgba(16,46,43,.18);padding:8px;display:none}',
+      '.app-menu-panel.open{display:block}',
+      '.app-menu-userline{padding:8px 10px;border-bottom:1px solid #eef2f0;margin-bottom:6px}',
+      '.app-menu-userline small{display:block;color:#7a8a87;font-size:11px}',
+      '.app-menu-userline strong{display:block;color:#1f3b38;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '.app-menu-item{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:none;border-radius:8px;padding:10px;font-size:14px;color:#213c39;cursor:pointer}',
+      '.app-menu-item:hover{background:#f2f7f5}',
+      '.app-menu-item .ic{width:18px;height:18px;flex:0 0 auto}',
+      '.app-menu-item.danger{color:#8e3131}',
+      '.app-menu-item.danger:hover{background:#fbeeee}',
+      /* Overlay + Modal */
+      '.auth-overlay{position:fixed;inset:0;background:rgba(15,30,28,.55);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;z-index:10001;overflow:auto}',
+      '.auth-overlay.open{display:flex}',
+      '.auth-modal{width:100%;max-width:680px;background:#fff;border-radius:16px;box-shadow:0 30px 70px rgba(10,28,26,.35);overflow:hidden;animation:authpop .18s ease}',
+      '@keyframes authpop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}',
+      '.auth-modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #eef2f0}',
+      '.auth-modal-head h2{margin:0;font-size:18px;color:#153a36}',
+      '.auth-modal-close{width:34px;height:34px;border-radius:50%;border:1px solid #e0e8e5;background:#f7faf9;font-size:18px;line-height:1;color:#3a5652;cursor:pointer}',
+      '.auth-modal-close:hover{background:#eef4f2}',
+      '.auth-modal-body{padding:22px}',
+      '.auth-section-title{margin:0 0 12px;font-size:13px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#5c706d}',
+      '.auth-section{margin-bottom:22px}',
+      '.auth-section:last-child{margin-bottom:0}',
+      '.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}',
+      '.field{display:grid;gap:6px;min-width:0}',
+      '.field.full{grid-column:1 / -1}',
+      '.field label{font-size:12px;font-weight:700;color:#4b6160}',
+      '.field input{width:100%;height:42px;border:1px solid #d3ddd9;border-radius:10px;padding:0 12px;font-size:14px;color:#1f2b2b}',
+      '.field input:focus{outline:none;border-color:#126b5f;box-shadow:0 0 0 3px rgba(18,107,95,.14)}',
+      '.field .hint{font-size:11px;color:#7a8a87}',
+      '.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}',
+      '.check{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:#31504d;line-height:1.4;padding:10px 12px;border:1px solid #e6edea;border-radius:10px;background:#f9fcfb}',
+      '.check input{margin-top:2px}',
+      '.inline-row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}',
+      '.inline-row .field{flex:1;min-width:180px}',
+      '.btn{height:42px;border:1px solid #126b5f;background:#126b5f;color:#fff;border-radius:10px;padding:0 18px;font-size:14px;font-weight:700;cursor:pointer}',
+      '.btn:hover{background:#0f5c52;border-color:#0f5c52}',
+      '.btn.secondary{background:#fff;color:#144641;border-color:#c2d3ce}',
+      '.btn.secondary:hover{background:#f3f9f7}',
+      '.btn.block{width:100%}',
+      '.linkbtn{background:none;border:none;color:#0f5c52;font-size:13px;font-weight:600;cursor:pointer;padding:4px 0}',
+      '.linkbtn:hover{text-decoration:underline}',
+      '.auth-modal-foot{display:flex;justify-content:flex-end;gap:10px;padding:16px 22px;border-top:1px solid #eef2f0;background:#fbfdfc}',
+      '.auth-status{margin:14px 22px 0;font-size:13px;line-height:1.4;color:#3a5553}',
       '.auth-status:empty{display:none}',
       '.auth-status.error{color:#8e3131}',
       '.auth-status.ok{color:#2f6a42}',
-      '@media (max-width:680px){.auth-grid{grid-template-columns:1fr}.auth-name{max-width:120px}}',
-      '@media print{.auth-widget{display:none!important}}'
+      '@media (max-width:640px){.form-grid{grid-template-columns:1fr}.check-grid{grid-template-columns:1fr}.app-menu-caption{display:none}}',
+      '@media print{.app-menu,.auth-overlay{display:none!important}}'
     ].join('');
     document.head.appendChild(style);
   }
 
-  const gearIcon = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2f4c49" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>';
-
-  function createWidget() {
-    const wrap = document.createElement('aside');
-    wrap.className = 'auth-widget';
-    wrap.innerHTML = [
-      '<div class="auth-bar">',
-      '  <div class="auth-avatar" id="auth-avatar"></div>',
-      '  <span class="auth-name" id="auth-name"></span>',
-      '  <button class="auth-iconbtn" id="auth-menu-toggle" type="button" title="Configuracoes da conta" aria-label="Configuracoes da conta">' + gearIcon + '</button>',
-      '  <button class="auth-ghost" id="auth-logout" type="button" style="display:none">Sair</button>',
-      '  <button class="auth-primary" id="auth-open-login" type="button">Entrar</button>',
-      '</div>',
-      '<section class="auth-panel" id="auth-panel">',
-      '  <div class="auth-logged-out" id="auth-logged-out">',
-      '    <p class="auth-panel-title">Acesse sua conta</p>',
-      '    <div class="auth-stack">',
-      '      <input class="auth-input" id="auth-email" type="email" placeholder="Seu email" autocomplete="email"/>',
-      '      <input class="auth-input" id="auth-password" type="password" placeholder="Sua senha" autocomplete="current-password"/>',
-      '    </div>',
-      '    <div class="auth-btnrow">',
-      '      <button class="auth-btn" id="auth-login-password" type="button">Ja tenho conta</button>',
-      '      <button class="auth-btn secondary" id="auth-signup-password" type="button">Primeiro acesso</button>',
-      '      <button class="auth-linkbtn" id="auth-reset-password" type="button">Esqueci / definir senha</button>',
-      '    </div>',
+  function createMenu() {
+    const menu = document.createElement('div');
+    menu.className = 'app-menu';
+    menu.innerHTML = [
+      '<button class="app-menu-btn" id="app-menu-btn" type="button" aria-label="Abrir menu">',
+      '  <span class="app-menu-lines"><span></span><span></span><span></span></span>',
+      '  <span class="app-avatar" id="app-avatar"></span>',
+      '  <span class="app-menu-caption" id="app-menu-caption">Menu</span>',
+      '</button>',
+      '<div class="app-menu-panel" id="app-menu-panel">',
+      '  <div class="app-menu-userline" id="app-menu-userline" style="display:none">',
+      '    <small>Conectado como</small>',
+      '    <strong id="app-menu-username"></strong>',
       '  </div>',
-      '  <div class="auth-logged-in" id="auth-logged-in" style="display:none">',
-      '    <p class="auth-panel-title">Configuracao da conta</p>',
-      '    <div class="auth-subtle">',
-      '      <p class="auth-small">Atualize sua senha quando quiser.</p>',
-      '      <div class="auth-stack">',
-      '        <input class="auth-input" id="auth-new-password" type="password" placeholder="Nova senha (minimo 6)" autocomplete="new-password"/>',
-      '        <button class="auth-btn secondary" id="auth-set-password" type="button">Atualizar senha</button>',
-      '      </div>',
-      '    </div>',
-      '    <div class="auth-divider"></div>',
-      '    <form class="auth-form" id="auth-profile-form">',
-      '      <div class="auth-field">',
-      '        <label for="profile-full-name">Nome completo</label>',
-      '        <input id="profile-full-name" type="text" autocomplete="name" />',
-      '      </div>',
-      '      <div class="auth-grid">',
-      '        <div class="auth-field">',
-      '          <label for="profile-birth-date">Nascimento</label>',
-      '          <input id="profile-birth-date" type="date" />',
-      '        </div>',
-      '        <div class="auth-field">',
-      '          <label for="profile-city">Cidade</label>',
-      '          <input id="profile-city" type="text" autocomplete="address-level2" />',
-      '        </div>',
-      '      </div>',
-      '      <div class="auth-grid">',
-      '        <div class="auth-field">',
-      '          <label for="profile-neighborhood">Bairro</label>',
-      '          <input id="profile-neighborhood" type="text" autocomplete="address-level3" />',
-      '        </div>',
-      '        <div class="auth-field">',
-      '          <label for="profile-avatar-url">URL da foto</label>',
-      '          <input id="profile-avatar-url" type="url" placeholder="https://..." />',
-      '        </div>',
-      '      </div>',
-      '      <div class="auth-field">',
-      '        <label for="profile-cpf">CPF (somente hash e salvo)</label>',
-      '        <input id="profile-cpf" type="text" inputmode="numeric" placeholder="000.000.000-00" />',
-      '      </div>',
-      '      <p class="auth-small" id="profile-cpf-info"></p>',
-      '      <div class="auth-checks">',
-      '        <label class="auth-check"><input id="profile-email-opt-in" type="checkbox" /> Receber comunicacoes por email</label>',
-      '        <label class="auth-check"><input id="profile-whatsapp-opt-in" type="checkbox" /> Receber comunicacoes por WhatsApp</label>',
-      '        <label class="auth-check"><input id="profile-terms" type="checkbox" /> Aceito os termos de uso</label>',
-      '        <label class="auth-check"><input id="profile-privacy" type="checkbox" /> Aceito a politica de privacidade</label>',
-      '      </div>',
-      '      <button class="auth-btn" id="auth-save-profile" type="submit">Salvar perfil</button>',
-      '    </form>',
-      '  </div>',
-      '  <p class="auth-status" id="auth-status"></p>',
-      '</section>'
+      '  <button class="app-menu-item" id="menu-login" type="button">Entrar</button>',
+      '  <button class="app-menu-item" id="menu-account" type="button" style="display:none">Minha conta</button>',
+      '  <button class="app-menu-item danger" id="menu-logout" type="button" style="display:none">Sair</button>',
+      '</div>'
     ].join('');
-    return wrap;
+    return menu;
   }
 
-  function mountWidget(widget) {
-    const slot = document.getElementById('auth-menu-slot');
-    if (slot) {
-      slot.appendChild(widget);
-      return;
-    }
-    const fallback = document.createElement('div');
-    fallback.style.padding = '12px';
-    fallback.style.display = 'flex';
-    fallback.style.justifyContent = 'flex-end';
-    fallback.appendChild(widget);
-    document.body.prepend(fallback);
+  function createLoginModal() {
+    const overlay = document.createElement('div');
+    overlay.className = 'auth-overlay';
+    overlay.id = 'login-overlay';
+    overlay.innerHTML = [
+      '<div class="auth-modal" role="dialog" aria-modal="true" aria-label="Acesso a conta">',
+      '  <div class="auth-modal-head">',
+      '    <h2>Acesse sua conta</h2>',
+      '    <button class="auth-modal-close" data-close="login" type="button" aria-label="Fechar">&times;</button>',
+      '  </div>',
+      '  <div class="auth-modal-body">',
+      '    <div class="form-grid">',
+      '      <div class="field full">',
+      '        <label for="login-email">Email</label>',
+      '        <input id="login-email" type="email" autocomplete="email" placeholder="voce@email.com" />',
+      '      </div>',
+      '      <div class="field full">',
+      '        <label for="login-password">Senha</label>',
+      '        <input id="login-password" type="password" autocomplete="current-password" placeholder="Sua senha" />',
+      '      </div>',
+      '    </div>',
+      '    <p class="auth-status" id="login-status"></p>',
+      '  </div>',
+      '  <div class="auth-modal-foot">',
+      '    <button class="linkbtn" id="login-reset" type="button">Esqueci / definir senha</button>',
+      '    <button class="btn secondary" id="login-signup" type="button">Primeiro acesso</button>',
+      '    <button class="btn" id="login-submit" type="button">Ja tenho conta</button>',
+      '  </div>',
+      '</div>'
+    ].join('');
+    return overlay;
+  }
+
+  function createAccountModal() {
+    const overlay = document.createElement('div');
+    overlay.className = 'auth-overlay';
+    overlay.id = 'account-overlay';
+    overlay.innerHTML = [
+      '<div class="auth-modal" role="dialog" aria-modal="true" aria-label="Minha conta">',
+      '  <div class="auth-modal-head">',
+      '    <h2>Minha conta</h2>',
+      '    <button class="auth-modal-close" data-close="account" type="button" aria-label="Fechar">&times;</button>',
+      '  </div>',
+      '  <div class="auth-modal-body">',
+      '    <div class="auth-section">',
+      '      <p class="auth-section-title">Seguranca</p>',
+      '      <div class="inline-row">',
+      '        <div class="field">',
+      '          <label for="acc-new-password">Nova senha</label>',
+      '          <input id="acc-new-password" type="password" autocomplete="new-password" placeholder="Minimo 6 caracteres" />',
+      '        </div>',
+      '        <button class="btn secondary" id="acc-set-password" type="button">Atualizar senha</button>',
+      '      </div>',
+      '    </div>',
+      '    <form id="acc-profile-form">',
+      '      <div class="auth-section">',
+      '        <p class="auth-section-title">Dados pessoais</p>',
+      '        <div class="form-grid">',
+      '          <div class="field full">',
+      '            <label for="acc-full-name">Nome completo</label>',
+      '            <input id="acc-full-name" type="text" autocomplete="name" />',
+      '          </div>',
+      '          <div class="field">',
+      '            <label for="acc-birth-date">Data de nascimento</label>',
+      '            <input id="acc-birth-date" type="date" />',
+      '          </div>',
+      '          <div class="field">',
+      '            <label for="acc-cpf">CPF</label>',
+      '            <input id="acc-cpf" type="text" inputmode="numeric" placeholder="000.000.000-00" />',
+      '            <span class="hint" id="acc-cpf-info"></span>',
+      '          </div>',
+      '        </div>',
+      '      </div>',
+      '      <div class="auth-section">',
+      '        <p class="auth-section-title">Endereco e foto</p>',
+      '        <div class="form-grid">',
+      '          <div class="field">',
+      '            <label for="acc-city">Cidade</label>',
+      '            <input id="acc-city" type="text" autocomplete="address-level2" />',
+      '          </div>',
+      '          <div class="field">',
+      '            <label for="acc-neighborhood">Bairro</label>',
+      '            <input id="acc-neighborhood" type="text" autocomplete="address-level3" />',
+      '          </div>',
+      '          <div class="field full">',
+      '            <label for="acc-avatar-url">URL da foto</label>',
+      '            <input id="acc-avatar-url" type="url" placeholder="https://..." />',
+      '          </div>',
+      '        </div>',
+      '      </div>',
+      '      <div class="auth-section">',
+      '        <p class="auth-section-title">Comunicacao e consentimento</p>',
+      '        <div class="check-grid">',
+      '          <label class="check"><input id="acc-email-opt-in" type="checkbox" /> Receber comunicacoes por email</label>',
+      '          <label class="check"><input id="acc-whatsapp-opt-in" type="checkbox" /> Receber comunicacoes por WhatsApp</label>',
+      '          <label class="check"><input id="acc-terms" type="checkbox" /> Aceito os termos de uso</label>',
+      '          <label class="check"><input id="acc-privacy" type="checkbox" /> Aceito a politica de privacidade</label>',
+      '        </div>',
+      '      </div>',
+      '    </form>',
+      '    <p class="auth-status" id="account-status"></p>',
+      '  </div>',
+      '  <div class="auth-modal-foot">',
+      '    <button class="btn secondary" data-close="account" type="button">Fechar</button>',
+      '    <button class="btn" id="acc-save" type="button">Salvar perfil</button>',
+      '  </div>',
+      '</div>'
+    ].join('');
+    return overlay;
   }
 
   function setStatus(el, message, type) {
+    if (!el) return;
     el.textContent = message || '';
     el.className = 'auth-status' + (type ? ' ' + type : '');
   }
@@ -171,67 +226,61 @@
     return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
-  function boot(client, widget) {
-    const panel = widget.querySelector('#auth-panel');
-    const toggleBtn = widget.querySelector('#auth-menu-toggle');
-    const openLoginBtn = widget.querySelector('#auth-open-login');
-    const logoutBtn = widget.querySelector('#auth-logout');
-    const nameEl = widget.querySelector('#auth-name');
-    const avatarEl = widget.querySelector('#auth-avatar');
+  function boot(client, refs) {
+    const {
+      menu, menuBtn, menuPanel, avatarEl, captionEl, userLine, userNameEl,
+      menuLogin, menuAccount, menuLogout,
+      loginOverlay, accountOverlay
+    } = refs;
 
-    const loggedOut = widget.querySelector('#auth-logged-out');
-    const loggedIn = widget.querySelector('#auth-logged-in');
+    const loginEmail = loginOverlay.querySelector('#login-email');
+    const loginPassword = loginOverlay.querySelector('#login-password');
+    const loginSubmit = loginOverlay.querySelector('#login-submit');
+    const loginSignup = loginOverlay.querySelector('#login-signup');
+    const loginReset = loginOverlay.querySelector('#login-reset');
+    const loginStatus = loginOverlay.querySelector('#login-status');
 
-    const emailInput = widget.querySelector('#auth-email');
-    const passwordInput = widget.querySelector('#auth-password');
-    const loginPasswordBtn = widget.querySelector('#auth-login-password');
-    const signupPasswordBtn = widget.querySelector('#auth-signup-password');
-    const resetPasswordBtn = widget.querySelector('#auth-reset-password');
-
-    const setPasswordBtn = widget.querySelector('#auth-set-password');
-    const newPasswordInput = widget.querySelector('#auth-new-password');
-    const profileForm = widget.querySelector('#auth-profile-form');
-    const saveProfileBtn = widget.querySelector('#auth-save-profile');
-    const statusEl = widget.querySelector('#auth-status');
+    const accStatus = accountOverlay.querySelector('#account-status');
+    const accSetPassword = accountOverlay.querySelector('#acc-set-password');
+    const accNewPassword = accountOverlay.querySelector('#acc-new-password');
+    const accSave = accountOverlay.querySelector('#acc-save');
+    const accForm = accountOverlay.querySelector('#acc-profile-form');
 
     const fields = {
-      fullName: widget.querySelector('#profile-full-name'),
-      birthDate: widget.querySelector('#profile-birth-date'),
-      city: widget.querySelector('#profile-city'),
-      neighborhood: widget.querySelector('#profile-neighborhood'),
-      avatarUrl: widget.querySelector('#profile-avatar-url'),
-      cpf: widget.querySelector('#profile-cpf'),
-      cpfInfo: widget.querySelector('#profile-cpf-info'),
-      emailOptIn: widget.querySelector('#profile-email-opt-in'),
-      whatsappOptIn: widget.querySelector('#profile-whatsapp-opt-in'),
-      terms: widget.querySelector('#profile-terms'),
-      privacy: widget.querySelector('#profile-privacy')
+      fullName: accountOverlay.querySelector('#acc-full-name'),
+      birthDate: accountOverlay.querySelector('#acc-birth-date'),
+      city: accountOverlay.querySelector('#acc-city'),
+      neighborhood: accountOverlay.querySelector('#acc-neighborhood'),
+      avatarUrl: accountOverlay.querySelector('#acc-avatar-url'),
+      cpf: accountOverlay.querySelector('#acc-cpf'),
+      cpfInfo: accountOverlay.querySelector('#acc-cpf-info'),
+      emailOptIn: accountOverlay.querySelector('#acc-email-opt-in'),
+      whatsappOptIn: accountOverlay.querySelector('#acc-whatsapp-opt-in'),
+      terms: accountOverlay.querySelector('#acc-terms'),
+      privacy: accountOverlay.querySelector('#acc-privacy')
     };
 
-    function setPanelOpen(open) {
-      panel.classList.toggle('open', Boolean(open));
+    function setMenuOpen(open) {
+      menuPanel.classList.toggle('open', Boolean(open));
     }
 
-    function readCredentials() {
-      const email = (emailInput.value || '').trim();
-      const password = (passwordInput.value || '').trim();
+    function openOverlay(overlay) {
+      overlay.classList.add('open');
+    }
+
+    function closeOverlay(overlay) {
+      overlay.classList.remove('open');
+    }
+
+    function readLoginCredentials() {
+      const email = (loginEmail.value || '').trim();
+      const password = (loginPassword.value || '').trim();
       if (!email) {
-        setStatus(statusEl, 'Digite um email valido.', 'error');
-        emailInput.focus();
+        setStatus(loginStatus, 'Digite um email valido.', 'error');
+        loginEmail.focus();
         return null;
       }
       return { email, password };
-    }
-
-    function withButtonsDisabled(callback) {
-      loginPasswordBtn.disabled = true;
-      signupPasswordBtn.disabled = true;
-      resetPasswordBtn.disabled = true;
-      return callback().finally(function () {
-        loginPasswordBtn.disabled = false;
-        signupPasswordBtn.disabled = false;
-        resetPasswordBtn.disabled = false;
-      });
     }
 
     async function loadProfile(userId) {
@@ -268,27 +317,27 @@
         fields.privacy.checked = Boolean(consent.accepted_privacy_at);
 
         fields.cpfInfo.textContent = privateData.cpf_last4
-          ? ('CPF salvo anteriormente. Finais: ' + privateData.cpf_last4)
+          ? ('CPF salvo. Finais: ' + privateData.cpf_last4)
           : 'CPF ainda nao informado.';
       } catch (err) {
-        setStatus(statusEl, 'Falha ao carregar perfil: ' + (err.message || 'erro desconhecido'), 'error');
+        setStatus(accStatus, 'Falha ao carregar perfil: ' + (err.message || 'erro desconhecido'), 'error');
       }
     }
 
     async function saveProfile() {
       if (!currentUserId) {
-        setStatus(statusEl, 'Sessao invalida para salvar perfil.', 'error');
+        setStatus(accStatus, 'Sessao invalida para salvar perfil.', 'error');
         return;
       }
 
       const cpfDigits = onlyDigits(fields.cpf.value);
       if (cpfDigits && cpfDigits.length !== 11) {
-        setStatus(statusEl, 'CPF invalido. Informe 11 digitos.', 'error');
+        setStatus(accStatus, 'CPF invalido. Informe 11 digitos.', 'error');
         return;
       }
 
       if (!fields.terms.checked || !fields.privacy.checked) {
-        setStatus(statusEl, 'Para salvar, confirme termos e politica.', 'error');
+        setStatus(accStatus, 'Para salvar, confirme termos e politica.', 'error');
         return;
       }
 
@@ -296,8 +345,8 @@
       const finalTermsAt = fields.terms.checked ? (acceptedTermsAt || nowIso) : null;
       const finalPrivacyAt = fields.privacy.checked ? (acceptedPrivacyAt || nowIso) : null;
 
-      saveProfileBtn.disabled = true;
-      setStatus(statusEl, 'Salvando perfil...', '');
+      accSave.disabled = true;
+      setStatus(accStatus, 'Salvando perfil...', '');
 
       try {
         const profilePayload = {
@@ -338,14 +387,14 @@
           if (privateUpsert.error) throw privateUpsert.error;
 
           fields.cpf.value = '';
-          fields.cpfInfo.textContent = 'CPF salvo com hash. Finais: ' + cpfDigits.slice(-4);
+          fields.cpfInfo.textContent = 'CPF salvo. Finais: ' + cpfDigits.slice(-4);
         }
 
-        setStatus(statusEl, 'Perfil salvo com sucesso.', 'ok');
+        setStatus(accStatus, 'Perfil salvo com sucesso.', 'ok');
       } catch (err) {
-        setStatus(statusEl, 'Falha ao salvar perfil: ' + (err.message || 'erro desconhecido'), 'error');
+        setStatus(accStatus, 'Falha ao salvar perfil: ' + (err.message || 'erro desconhecido'), 'error');
       } finally {
-        saveProfileBtn.disabled = false;
+        accSave.disabled = false;
       }
     }
 
@@ -354,157 +403,184 @@
       if (user) {
         avatarEl.style.display = 'grid';
         avatarEl.textContent = initialsFromEmail(user.email || user.id);
-        nameEl.style.display = 'inline';
-        nameEl.textContent = user.email || user.id;
-        toggleBtn.style.display = 'inline-flex';
-        logoutBtn.style.display = 'inline-flex';
-        openLoginBtn.style.display = 'none';
-        loggedOut.style.display = 'none';
-        loggedIn.style.display = 'block';
-        setStatus(statusEl, '', '');
+        captionEl.textContent = (user.email || '').split('@')[0] || 'Conta';
+        userLine.style.display = 'block';
+        userNameEl.textContent = user.email || user.id;
+        menuLogin.style.display = 'none';
+        menuAccount.style.display = 'flex';
+        menuLogout.style.display = 'flex';
         loadProfile(user.id);
       } else {
         avatarEl.style.display = 'none';
-        nameEl.style.display = 'none';
-        toggleBtn.style.display = 'none';
-        logoutBtn.style.display = 'none';
-        openLoginBtn.style.display = 'inline-flex';
-        loggedOut.style.display = 'block';
-        loggedIn.style.display = 'none';
+        captionEl.textContent = 'Menu';
+        userLine.style.display = 'none';
+        userNameEl.textContent = '';
+        menuLogin.style.display = 'flex';
+        menuAccount.style.display = 'none';
+        menuLogout.style.display = 'none';
         currentUserId = '';
-        setStatus(statusEl, '', '');
       }
     }
 
-    toggleBtn.addEventListener('click', function () {
-      setPanelOpen(!panel.classList.contains('open'));
-    });
-
-    openLoginBtn.addEventListener('click', function () {
-      const willOpen = !panel.classList.contains('open');
-      setPanelOpen(willOpen);
-      if (willOpen) {
-        emailInput.focus();
-      }
-    });
-
-    loginPasswordBtn.addEventListener('click', async function () {
-      const creds = readCredentials();
-      if (!creds) return;
-      if (!creds.password || creds.password.length < 6) {
-        setStatus(statusEl, 'Digite sua senha (minimo de 6 caracteres).', 'error');
-        passwordInput.focus();
-        return;
-      }
-
-      await withButtonsDisabled(async function () {
-        setStatus(statusEl, 'Entrando...', '');
-        try {
-          const result = await client.auth.signInWithPassword({ email: creds.email, password: creds.password });
-          if (result.error) throw result.error;
-          setStatus(statusEl, 'Login realizado com sucesso.', 'ok');
-          setPanelOpen(false);
-        } catch (err) {
-          setStatus(statusEl, 'Falha no login: ' + (err.message || 'erro desconhecido'), 'error');
-        }
-      });
-    });
-
-    signupPasswordBtn.addEventListener('click', async function () {
-      const creds = readCredentials();
-      if (!creds) return;
-      if (!creds.password || creds.password.length < 6) {
-        setStatus(statusEl, 'Para criar conta, use senha com minimo de 6 caracteres.', 'error');
-        passwordInput.focus();
-        return;
-      }
-
-      await withButtonsDisabled(async function () {
-        setStatus(statusEl, 'Criando conta...', '');
-        try {
-          const redirect = config.defaultRedirectTo || (window.location.origin + window.location.pathname);
-          const result = await client.auth.signUp({
-            email: creds.email,
-            password: creds.password,
-            options: { emailRedirectTo: redirect }
-          });
-          if (result.error) throw result.error;
-
-          if (result.data && result.data.user && Array.isArray(result.data.user.identities) && result.data.user.identities.length === 0) {
-            setStatus(statusEl, 'Email ja cadastrado. Use "Ja tenho conta" ou "Esqueci / definir senha".', 'error');
-          } else if (result.data && result.data.session) {
-            setStatus(statusEl, 'Conta criada e login ativo.', 'ok');
-            setPanelOpen(false);
-          } else {
-            setStatus(statusEl, 'Conta criada. Verifique seu email para confirmar, se solicitado.', 'ok');
-          }
-        } catch (err) {
-          setStatus(statusEl, 'Falha ao criar conta: ' + (err.message || 'erro desconhecido'), 'error');
-        }
-      });
-    });
-
-    resetPasswordBtn.addEventListener('click', async function () {
-      const creds = readCredentials();
-      if (!creds) return;
-
-      await withButtonsDisabled(async function () {
-        setStatus(statusEl, 'Enviando email para definir senha...', '');
-        try {
-          const redirect = config.defaultRedirectTo || (window.location.origin + window.location.pathname);
-          const result = await client.auth.resetPasswordForEmail(creds.email, { redirectTo: redirect });
-          if (result.error) throw result.error;
-          setStatus(statusEl, 'Email enviado. Abra o link para definir sua senha.', 'ok');
-        } catch (err) {
-          setStatus(statusEl, 'Falha ao enviar email de senha: ' + (err.message || 'erro desconhecido'), 'error');
-        }
-      });
-    });
-
-    setPasswordBtn.addEventListener('click', async function () {
-      const newPassword = (newPasswordInput.value || '').trim();
-      if (!newPassword || newPassword.length < 6) {
-        setStatus(statusEl, 'Nova senha deve ter no minimo 6 caracteres.', 'error');
-        newPasswordInput.focus();
-        return;
-      }
-
-      setPasswordBtn.disabled = true;
-      setStatus(statusEl, 'Salvando nova senha...', '');
-      try {
-        const result = await client.auth.updateUser({ password: newPassword });
-        if (result.error) throw result.error;
-        newPasswordInput.value = '';
-        setStatus(statusEl, 'Senha atualizada com sucesso.', 'ok');
-      } catch (err) {
-        setStatus(statusEl, 'Falha ao atualizar senha: ' + (err.message || 'erro desconhecido'), 'error');
-      } finally {
-        setPasswordBtn.disabled = false;
-      }
-    });
-
-    profileForm.addEventListener('submit', function (event) {
-      event.preventDefault();
-      saveProfile();
-    });
-
-    logoutBtn.addEventListener('click', async function () {
-      logoutBtn.disabled = true;
-      try {
-        const result = await client.auth.signOut();
-        if (result.error) throw result.error;
-        setPanelOpen(false);
-      } catch (err) {
-        setStatus(statusEl, 'Falha ao sair: ' + (err.message || 'erro desconhecido'), 'error');
-      } finally {
-        logoutBtn.disabled = false;
-      }
+    // Menu interactions
+    menuBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      setMenuOpen(!menuPanel.classList.contains('open'));
     });
 
     document.addEventListener('click', function (event) {
-      if (!widget.contains(event.target)) {
-        setPanelOpen(false);
+      if (!menu.contains(event.target)) {
+        setMenuOpen(false);
       }
+    });
+
+    menuLogin.addEventListener('click', function () {
+      setMenuOpen(false);
+      setStatus(loginStatus, '', '');
+      openOverlay(loginOverlay);
+      loginEmail.focus();
+    });
+
+    menuAccount.addEventListener('click', function () {
+      setMenuOpen(false);
+      setStatus(accStatus, '', '');
+      openOverlay(accountOverlay);
+    });
+
+    menuLogout.addEventListener('click', async function () {
+      setMenuOpen(false);
+      try {
+        await client.auth.signOut();
+      } catch (err) {
+        // silencioso
+      }
+    });
+
+    // Overlay close handlers
+    [loginOverlay, accountOverlay].forEach(function (overlay) {
+      overlay.addEventListener('click', function (event) {
+        if (event.target === overlay) {
+          closeOverlay(overlay);
+        }
+      });
+      overlay.querySelectorAll('[data-close]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          closeOverlay(overlay);
+        });
+      });
+    });
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') {
+        closeOverlay(loginOverlay);
+        closeOverlay(accountOverlay);
+        setMenuOpen(false);
+      }
+    });
+
+    // Login actions
+    loginSubmit.addEventListener('click', async function () {
+      const creds = readLoginCredentials();
+      if (!creds) return;
+      if (!creds.password || creds.password.length < 6) {
+        setStatus(loginStatus, 'Digite sua senha (minimo de 6 caracteres).', 'error');
+        loginPassword.focus();
+        return;
+      }
+      loginSubmit.disabled = true;
+      setStatus(loginStatus, 'Entrando...', '');
+      try {
+        const result = await client.auth.signInWithPassword({ email: creds.email, password: creds.password });
+        if (result.error) throw result.error;
+        setStatus(loginStatus, 'Login realizado com sucesso.', 'ok');
+        closeOverlay(loginOverlay);
+      } catch (err) {
+        setStatus(loginStatus, 'Falha no login: ' + (err.message || 'erro desconhecido'), 'error');
+      } finally {
+        loginSubmit.disabled = false;
+      }
+    });
+
+    loginSignup.addEventListener('click', async function () {
+      const creds = readLoginCredentials();
+      if (!creds) return;
+      if (!creds.password || creds.password.length < 6) {
+        setStatus(loginStatus, 'Para criar conta, use senha com minimo de 6 caracteres.', 'error');
+        loginPassword.focus();
+        return;
+      }
+      loginSignup.disabled = true;
+      setStatus(loginStatus, 'Criando conta...', '');
+      try {
+        const redirect = config.defaultRedirectTo || (window.location.origin + window.location.pathname);
+        const result = await client.auth.signUp({
+          email: creds.email,
+          password: creds.password,
+          options: { emailRedirectTo: redirect }
+        });
+        if (result.error) throw result.error;
+
+        if (result.data && result.data.user && Array.isArray(result.data.user.identities) && result.data.user.identities.length === 0) {
+          setStatus(loginStatus, 'Email ja cadastrado. Use "Ja tenho conta" ou "Esqueci / definir senha".', 'error');
+        } else if (result.data && result.data.session) {
+          setStatus(loginStatus, 'Conta criada e login ativo.', 'ok');
+          closeOverlay(loginOverlay);
+        } else {
+          setStatus(loginStatus, 'Conta criada. Verifique seu email para confirmar, se solicitado.', 'ok');
+        }
+      } catch (err) {
+        setStatus(loginStatus, 'Falha ao criar conta: ' + (err.message || 'erro desconhecido'), 'error');
+      } finally {
+        loginSignup.disabled = false;
+      }
+    });
+
+    loginReset.addEventListener('click', async function () {
+      const creds = readLoginCredentials();
+      if (!creds) return;
+      loginReset.disabled = true;
+      setStatus(loginStatus, 'Enviando email para definir senha...', '');
+      try {
+        const redirect = config.defaultRedirectTo || (window.location.origin + window.location.pathname);
+        const result = await client.auth.resetPasswordForEmail(creds.email, { redirectTo: redirect });
+        if (result.error) throw result.error;
+        setStatus(loginStatus, 'Email enviado. Abra o link para definir sua senha.', 'ok');
+      } catch (err) {
+        setStatus(loginStatus, 'Falha ao enviar email: ' + (err.message || 'erro desconhecido'), 'error');
+      } finally {
+        loginReset.disabled = false;
+      }
+    });
+
+    // Account actions
+    accSetPassword.addEventListener('click', async function () {
+      const newPassword = (accNewPassword.value || '').trim();
+      if (!newPassword || newPassword.length < 6) {
+        setStatus(accStatus, 'Nova senha deve ter no minimo 6 caracteres.', 'error');
+        accNewPassword.focus();
+        return;
+      }
+      accSetPassword.disabled = true;
+      setStatus(accStatus, 'Salvando nova senha...', '');
+      try {
+        const result = await client.auth.updateUser({ password: newPassword });
+        if (result.error) throw result.error;
+        accNewPassword.value = '';
+        setStatus(accStatus, 'Senha atualizada com sucesso.', 'ok');
+      } catch (err) {
+        setStatus(accStatus, 'Falha ao atualizar senha: ' + (err.message || 'erro desconhecido'), 'error');
+      } finally {
+        accSetPassword.disabled = false;
+      }
+    });
+
+    accSave.addEventListener('click', function () {
+      saveProfile();
+    });
+
+    accForm.addEventListener('submit', function (event) {
+      event.preventDefault();
+      saveProfile();
     });
 
     client.auth.getSession().then(function (res) {
@@ -518,22 +594,42 @@
 
   function start() {
     injectStyles();
-    const widget = createWidget();
-    mountWidget(widget);
-    const statusEl = widget.querySelector('#auth-status');
+
+    const menu = createMenu();
+    document.body.appendChild(menu);
+
+    const loginOverlay = createLoginModal();
+    const accountOverlay = createAccountModal();
+    document.body.appendChild(loginOverlay);
+    document.body.appendChild(accountOverlay);
+
+    const refs = {
+      menu: menu,
+      menuBtn: menu.querySelector('#app-menu-btn'),
+      menuPanel: menu.querySelector('#app-menu-panel'),
+      avatarEl: menu.querySelector('#app-avatar'),
+      captionEl: menu.querySelector('#app-menu-caption'),
+      userLine: menu.querySelector('#app-menu-userline'),
+      userNameEl: menu.querySelector('#app-menu-username'),
+      menuLogin: menu.querySelector('#menu-login'),
+      menuAccount: menu.querySelector('#menu-account'),
+      menuLogout: menu.querySelector('#menu-logout'),
+      loginOverlay: loginOverlay,
+      accountOverlay: accountOverlay
+    };
 
     if (!window.supabase || !window.supabase.createClient) {
-      setStatus(statusEl, 'SDK do Supabase nao foi carregado.', 'error');
+      refs.captionEl.textContent = 'Menu';
       return;
     }
 
     if (!hasConfig) {
-      setStatus(statusEl, 'Configure supabase-config.js para ativar o login.', 'error');
+      refs.captionEl.textContent = 'Menu';
       return;
     }
 
     const client = window.supabase.createClient(config.url, config.anonKey);
-    boot(client, widget);
+    boot(client, refs);
   }
 
   if (document.readyState === 'loading') {
