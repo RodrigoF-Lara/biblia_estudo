@@ -90,6 +90,7 @@
       '.analytics-section{border:1px solid #e3e9e6;border-radius:14px;overflow:hidden}',
       '.analytics-section h3{margin:0;padding:12px 14px;background:#f7fbfa;border-bottom:1px solid #e3e9e6;font-size:14px;color:#21413d}',
       '.analytics-section .body{padding:0 14px 14px}',
+      '.analytics-section .scroll{overflow:auto}',
       '.analytics-empty{padding:12px 0;color:#6f807d;font-size:14px}',
       '.analytics-loading{padding:16px 0;color:#6f807d;font-size:14px}',
       '@media (max-width:640px){.form-grid{grid-template-columns:1fr}.check-grid{grid-template-columns:1fr}.app-menu-caption{display:none}.analytics-toolbar{align-items:stretch}.analytics-filter{min-width:0;flex:1 1 100%}.analytics-toolbar .btn{width:100%}}',
@@ -636,7 +637,7 @@
       try {
         let query = client
           .from('site_access_logs')
-          .select('occurred_at, access_day, event_type, visitor_id, user_id, study_id, study_title, study_ref')
+          .select('occurred_at, access_day, event_type, visitor_id, user_id, user_email, actor_name, actor_city, actor_ip, study_id, study_title, study_ref')
           .order('occurred_at', { ascending: false });
 
         if (startIso) query = query.gte('access_day', startIso);
@@ -761,6 +762,23 @@
             }).join('')
           : '<tr><td colspan="6"><div class="analytics-empty">Sem dados por estudo ainda.</div></td></tr>';
 
+          const recentRows = (logsRes.data || []).slice(0, 20).map(function (row) {
+            const actorName = row.actor_name || (row.user_email ? row.user_email.split('@')[0] : 'Visitante');
+            const actorCity = row.actor_city || '-';
+            const actorIp = row.actor_ip || '-';
+            const actorKind = row.user_id ? 'Logado' : 'Anonimo';
+            const target = row.study_ref || row.study_title || row.study_id || '-';
+            return '<tr>' +
+              '<td>' + (row.access_day || (row.occurred_at ? String(row.occurred_at).slice(0, 10) : '-')) + '</td>' +
+              '<td>' + actorName + '</td>' +
+              '<td>' + actorCity + '</td>' +
+              '<td>' + actorIp + '</td>' +
+              '<td>' + actorKind + '</td>' +
+              '<td>' + (row.event_type || '-') + '</td>' +
+              '<td>' + target + '</td>' +
+            '</tr>';
+          }).join('') || '<tr><td colspan="7"><div class="analytics-empty">Sem acessos recentes.</div></td></tr>';
+
         contentEl.innerHTML = summaryHtml +
           '<div class="analytics-section">' +
             '<h3>Filtros ativos</h3>' +
@@ -783,6 +801,17 @@
               '<table class="analytics-table">' +
                 '<thead><tr><th>Dia</th><th>Referencia</th><th>Titulo</th><th>Eventos</th><th>Visitantes</th><th>Visualizacoes</th></tr></thead>' +
                 '<tbody>' + studyRows + '</tbody>' +
+              '</table>' +
+            '</div>' +
+          '</div>';
+
+        contentEl.innerHTML +=
+          '<div class="analytics-section">' +
+            '<h3>Acessos recentes</h3>' +
+            '<div class="body scroll">' +
+              '<table class="analytics-table">' +
+                '<thead><tr><th>Dia</th><th>Nome</th><th>Cidade</th><th>IP</th><th>Tipo</th><th>Evento</th><th>Estudo</th></tr></thead>' +
+                '<tbody>' + recentRows + '</tbody>' +
               '</table>' +
             '</div>' +
           '</div>';

@@ -523,11 +523,37 @@ create table if not exists public.site_access_logs (
   session_id text not null,
   user_id uuid references auth.users(id) on delete set null,
   user_email text,
+  actor_name text,
+  actor_city text,
+  actor_ip text,
   study_id text,
   study_title text,
   study_ref text,
   metadata jsonb not null default '{}'::jsonb
 );
+
+alter table public.site_access_logs
+  add column if not exists actor_name text;
+
+alter table public.site_access_logs
+  add column if not exists actor_city text;
+
+alter table public.site_access_logs
+  add column if not exists actor_ip text;
+
+update public.site_access_logs sl
+set
+  actor_name = coalesce(nullif(trim(sl.actor_name), ''), p.full_name, split_part(sl.user_email, '@', 1), 'Visitante'),
+  actor_city = coalesce(nullif(trim(sl.actor_city), ''), p.city),
+  actor_ip = nullif(trim(sl.actor_ip), '')
+from public.profiles p
+where p.id = sl.user_id
+  and (
+    sl.actor_name is null
+    or trim(sl.actor_name) = ''
+    or sl.actor_city is null
+    or trim(sl.actor_city) = ''
+  );
 
 create index if not exists site_access_logs_access_day_idx
   on public.site_access_logs (access_day);
