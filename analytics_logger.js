@@ -75,6 +75,12 @@
     return metadata;
   }
 
+  function sleep(ms) {
+    return new Promise(function (resolve) {
+      setTimeout(resolve, ms);
+    });
+  }
+
   function getActorCacheKey(currentUser) {
     return currentUser && currentUser.id ? 'user:' + currentUser.id : 'anon:' + getVisitorId();
   }
@@ -145,12 +151,24 @@
     return info;
   }
 
+  async function waitForCurrentUser(maxWaitMs) {
+    const deadline = Date.now() + (maxWaitMs || 1200);
+    let currentUser = getCurrentUser();
+
+    while (!currentUser && Date.now() < deadline) {
+      await sleep(100);
+      currentUser = getCurrentUser();
+    }
+
+    return currentUser;
+  }
+
   async function track(eventType, payload) {
     if (!context.client || !eventType) {
       return;
     }
 
-    const currentUser = getCurrentUser();
+    const currentUser = await waitForCurrentUser(1200);
     const data = payload || {};
     const actorInfo = await resolveActorInfo(currentUser);
     const row = {
