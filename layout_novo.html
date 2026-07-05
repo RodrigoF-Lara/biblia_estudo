@@ -144,6 +144,13 @@
       gap: 18px;
     }
 
+    .account-menu-wrap {
+      width: min(1120px, calc(100% - 28px));
+      margin: 12px auto 0;
+      display: flex;
+      justify-content: flex-end;
+    }
+
     .hero {
       position: relative;
       overflow: hidden;
@@ -457,6 +464,10 @@
       </div>
     </div>
   </header>
+
+  <div class="account-menu-wrap">
+    <div id="auth-menu-slot"></div>
+  </div>
 
   <main class="site">
     <section class="hero">

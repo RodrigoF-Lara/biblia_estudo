@@ -1,4 +1,4 @@
-# Setup de Login com Supabase (Magic Link)
+# Setup de Login com Supabase (Usuario e Senha)
 
 Este projeto ja esta com frontend configurado para o projeto:
 - URL: https://yffkmzinhvihylcgwumt.supabase.co
@@ -24,8 +24,8 @@ No painel: Authentication > URL Configuration
 No painel: Authentication > Providers > Email
 
 1. Deixe o provedor Email habilitado.
-2. Para login sem link por email toda vez, habilite "Email + Password".
-3. Magic Link continua opcional pelo botao "Entrar por link magico" do widget.
+2. Habilite "Email + Password".
+3. O site usa somente usuario e senha no frontend.
 
 ## 3) Criar tabelas e politicas (RLS)
 No painel: SQL Editor
@@ -47,9 +47,11 @@ on conflict (user_id) do nothing;
 ## 5) Teste rapido local
 1. Abra o projeto com servidor local (Live Server ou python -m http.server 5500).
 2. Acesse busca_estudo.html.
-3. No card Conta, digite email e clique Entrar.
-4. Clique no link recebido no email.
-5. Volte ao site e confirme "Sessao ativa".
+3. No card Conta, use:
+   - Ja tenho conta
+   - Primeiro acesso
+   - Esqueci/definir senha
+4. Confirme "Sessao ativa" apos entrar.
 6. Clique em "Completar perfil", preencha nome, nascimento, cidade, bairro, foto e CPF.
 7. Clique em "Salvar perfil" e confirme a mensagem de sucesso.
 

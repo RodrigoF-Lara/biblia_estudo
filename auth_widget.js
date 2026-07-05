@@ -1,7 +1,6 @@
 (function () {
   const config = window.BIBLIA_SUPABASE_CONFIG || {};
   const hasConfig = Boolean(config.url && config.anonKey);
-  const widgetStateKey = 'bibliaAuthWidgetOpen';
   let currentUserId = '';
   let acceptedTermsAt = null;
   let acceptedPrivacyAt = null;
@@ -9,19 +8,12 @@
   function injectStyles() {
     const style = document.createElement('style');
     style.textContent = [
-      '.auth-widget{position:fixed;right:16px;bottom:16px;z-index:9999;width:min(390px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto;background:#fff;border:1px solid #d8dfda;border-radius:14px;box-shadow:0 12px 32px rgba(11,41,39,0.18);padding:12px 12px 10px;font-family:Arial,sans-serif;color:#1f2b2b}',
-      '.auth-widget.auth-collapsed{width:auto;max-height:none;overflow:visible;background:transparent;border:none;box-shadow:none;padding:0}',
-      '.auth-fab{height:40px;border:1px solid #126b5f;background:#126b5f;color:#fff;border-radius:999px;padding:0 14px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 10px 24px rgba(11,41,39,0.28)}',
-      '.auth-fab:hover{background:#0f5c52;border-color:#0f5c52}',
-      '.auth-widget.auth-open .auth-fab{display:none}',
-      '.auth-widget.auth-collapsed .auth-panel{display:none}',
-      '.auth-panel-head{display:flex;align-items:center;justify-content:space-between;gap:8px}',
-      '.auth-close{height:28px;min-width:28px;border:1px solid #bfd2cd;background:#f7fbfa;color:#1f4d48;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;line-height:1}',
-      '.auth-close:hover{background:#edf6f4}',
+      '.auth-widget{width:100%;max-width:520px;background:#fff;border:1px solid #d8dfda;border-radius:14px;box-shadow:0 10px 22px rgba(11,41,39,0.12);padding:12px;font-family:Arial,sans-serif;color:#1f2b2b}',
       '.auth-widget *{box-sizing:border-box}',
-      '.auth-title{margin:0 0 8px;font-size:14px;font-weight:700;color:#173a37}',
-      '.auth-row{display:flex;gap:8px;align-items:center}',
-      '.auth-input{flex:1;height:36px;padding:0 10px;border:1px solid #ccd7d2;border-radius:8px;font-size:14px}',
+      '.auth-panel-head{display:flex;align-items:center;justify-content:space-between;gap:8px}',
+      '.auth-title{margin:0 0 6px;font-size:15px;font-weight:700;color:#173a37}',
+      '.auth-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}',
+      '.auth-input{flex:1;height:36px;padding:0 10px;border:1px solid #ccd7d2;border-radius:8px;font-size:14px;min-width:160px}',
       '.auth-btn{height:36px;border:1px solid #126b5f;background:#126b5f;color:#fff;border-radius:8px;padding:0 11px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}',
       '.auth-btn:hover{background:#0f5c52;border-color:#0f5c52}',
       '.auth-btn.secondary{background:#fff;color:#144641;border-color:#b8cec8}',
@@ -39,10 +31,10 @@
       '.auth-password-box{display:grid;gap:8px;margin-top:8px;padding:8px;border:1px dashed #c8d8d3;border-radius:10px;background:#f9fcfb}',
       '.auth-toggle{display:inline-flex;align-items:center;justify-content:center;height:32px;padding:0 10px;border-radius:8px;border:1px solid #b8cec8;background:#f3f9f7;color:#154842;font-size:12px;font-weight:700;cursor:pointer}',
       '.auth-small{font-size:11px;color:#5a6f6e;margin:0}',
-      '.auth-status{margin:6px 0 0;font-size:12px;line-height:1.4;color:#3a5553}',
+      '.auth-status{margin:8px 0 0;font-size:12px;line-height:1.4;color:#3a5553}',
       '.auth-status.error{color:#8e3131}',
       '.auth-status.ok{color:#2f6a42}',
-      '.auth-widget.hidden{display:none}',
+      '@media (max-width:680px){.auth-widget{max-width:100%}.auth-grid{grid-template-columns:1fr}.auth-btn{width:100%}.auth-row{align-items:stretch}}',
       '@media print{.auth-widget{display:none!important}}'
     ].join('');
     document.head.appendChild(style);
@@ -50,44 +42,34 @@
 
   function createWidget() {
     const wrap = document.createElement('aside');
-    wrap.className = 'auth-widget auth-collapsed';
+    wrap.className = 'auth-widget';
     wrap.innerHTML = [
-      '<button class="auth-fab" id="auth-fab" type="button">Conta</button>',
-      '<div class="auth-panel">',
       '<div class="auth-panel-head">',
       '  <p class="auth-title">Conta</p>',
-      '  <button class="auth-close" id="auth-close" type="button" aria-label="Fechar painel">x</button>',
       '</div>',
       '<div class="auth-logged-out">',
       '  <div class="auth-row">',
       '    <input class="auth-input" id="auth-email" type="email" placeholder="Seu email" autocomplete="email"/>',
-      '  </div>',
-      '  <div class="auth-row" style="margin-top:8px">',
       '    <input class="auth-input" id="auth-password" type="password" placeholder="Sua senha" autocomplete="current-password"/>',
       '  </div>',
       '  <div class="auth-row" style="margin-top:8px">',
-      '    <button class="auth-btn" id="auth-login-password">Entrar com senha</button>',
-      '    <button class="auth-btn secondary" id="auth-signup-password">Criar conta</button>',
+      '    <button class="auth-btn" id="auth-login-password" type="button">Ja tenho conta</button>',
+      '    <button class="auth-btn secondary" id="auth-signup-password" type="button">Primeiro acesso</button>',
+      '    <button class="auth-btn secondary" id="auth-reset-password" type="button">Esqueci/definir senha</button>',
       '  </div>',
-      '  <div class="auth-row" style="margin-top:8px">',
-      '    <button class="auth-btn secondary" id="auth-login">Entrar por link magico</button>',
-      '  </div>',
-      '  <div class="auth-row" style="margin-top:8px">',
-      '    <button class="auth-btn secondary" id="auth-reset-password">Definir senha por email</button>',
-      '  </div>',
-      '  <p class="auth-meta">Depois do login com senha, a sessao fica ativa no navegador.</p>',
+      '  <p class="auth-meta">Acesso somente por usuario e senha. O login por link magico foi removido do site.</p>',
       '</div>',
       '<div class="auth-logged-in" style="display:none">',
       '  <p class="auth-meta" id="auth-user"></p>',
       '  <div class="auth-row">',
       '    <button class="auth-toggle" id="auth-toggle-profile" type="button">Completar perfil</button>',
-      '    <button class="auth-btn secondary" id="auth-logout">Sair</button>',
+      '    <button class="auth-btn secondary" id="auth-logout" type="button">Sair</button>',
       '  </div>',
       '  <div class="auth-password-box">',
-      '    <p class="auth-small">Primeiro acesso por link magico? Defina uma senha para os proximos logins.</p>',
+      '    <p class="auth-small">Atualize sua senha quando quiser.</p>',
       '    <div class="auth-row">',
       '      <input class="auth-input" id="auth-new-password" type="password" placeholder="Nova senha (minimo 6)" autocomplete="new-password"/>',
-      '      <button class="auth-btn secondary" id="auth-set-password" type="button">Definir senha</button>',
+      '      <button class="auth-btn secondary" id="auth-set-password" type="button">Atualizar senha</button>',
       '    </div>',
       '  </div>',
       '  <div class="auth-divider"></div>',
@@ -130,11 +112,24 @@
       '    <button class="auth-btn" id="auth-save-profile" type="submit">Salvar perfil</button>',
       '  </form>',
       '</div>',
-      '<p class="auth-status" id="auth-status"></p>',
-      '</div>'
+      '<p class="auth-status" id="auth-status"></p>'
     ].join('');
-    document.body.appendChild(wrap);
     return wrap;
+  }
+
+  function mountWidget(widget) {
+    const slot = document.getElementById('auth-menu-slot');
+    if (slot) {
+      slot.appendChild(widget);
+      return;
+    }
+
+    const fallback = document.createElement('div');
+    fallback.style.padding = '12px';
+    fallback.style.display = 'flex';
+    fallback.style.justifyContent = 'center';
+    fallback.appendChild(widget);
+    document.body.prepend(fallback);
   }
 
   function setStatus(el, message, type) {
@@ -156,13 +151,10 @@
   }
 
   function boot(client, widget) {
-    const fabBtn = widget.querySelector('#auth-fab');
-    const closeBtn = widget.querySelector('#auth-close');
     const loggedOut = widget.querySelector('.auth-logged-out');
     const loggedIn = widget.querySelector('.auth-logged-in');
     const emailInput = widget.querySelector('#auth-email');
     const passwordInput = widget.querySelector('#auth-password');
-    const loginBtn = widget.querySelector('#auth-login');
     const resetPasswordBtn = widget.querySelector('#auth-reset-password');
     const loginPasswordBtn = widget.querySelector('#auth-login-password');
     const signupPasswordBtn = widget.querySelector('#auth-signup-password');
@@ -188,28 +180,6 @@
       terms: widget.querySelector('#profile-terms'),
       privacy: widget.querySelector('#profile-privacy')
     };
-
-    function setWidgetOpen(isOpen) {
-      if (isOpen) {
-        widget.classList.add('auth-open');
-        widget.classList.remove('auth-collapsed');
-      } else {
-        widget.classList.remove('auth-open');
-        widget.classList.add('auth-collapsed');
-      }
-      localStorage.setItem(widgetStateKey, isOpen ? '1' : '0');
-    }
-
-    const initialOpen = localStorage.getItem(widgetStateKey) === '1';
-    setWidgetOpen(initialOpen);
-
-    fabBtn.addEventListener('click', function () {
-      setWidgetOpen(true);
-    });
-
-    closeBtn.addEventListener('click', function () {
-      setWidgetOpen(false);
-    });
 
     async function loadProfile(userId) {
       currentUserId = userId;
@@ -380,12 +350,10 @@
     }
 
     function withButtonsDisabled(callback) {
-      loginBtn.disabled = true;
       resetPasswordBtn.disabled = true;
       loginPasswordBtn.disabled = true;
       signupPasswordBtn.disabled = true;
       return callback().finally(function () {
-        loginBtn.disabled = false;
         resetPasswordBtn.disabled = false;
         loginPasswordBtn.disabled = false;
         signupPasswordBtn.disabled = false;
@@ -408,9 +376,9 @@
           throw result.error;
         }
         newPasswordInput.value = '';
-        setStatus(statusEl, 'Senha definida com sucesso. Proximos logins podem ser por senha.', 'ok');
+        setStatus(statusEl, 'Senha atualizada com sucesso.', 'ok');
       } catch (err) {
-        setStatus(statusEl, 'Falha ao definir senha: ' + (err.message || 'erro desconhecido'), 'error');
+        setStatus(statusEl, 'Falha ao atualizar senha: ' + (err.message || 'erro desconhecido'), 'error');
       } finally {
         setPasswordBtn.disabled = false;
       }
@@ -450,33 +418,6 @@
       saveProfile();
     });
 
-    loginBtn.addEventListener('click', async function () {
-      const creds = readCredentials();
-      if (!creds) {
-        return;
-      }
-
-      await withButtonsDisabled(async function () {
-        setStatus(statusEl, 'Enviando link de acesso...', '');
-        try {
-          const redirect = config.defaultRedirectTo || (window.location.origin + window.location.pathname);
-          const result = await client.auth.signInWithOtp({
-            email: creds.email,
-            options: { emailRedirectTo: redirect }
-          });
-
-          if (result.error) {
-            throw result.error;
-          }
-
-          setWidgetOpen(true);
-          setStatus(statusEl, 'Link enviado. Abra seu email e clique para entrar.', 'ok');
-        } catch (err) {
-          setStatus(statusEl, 'Falha ao enviar link: ' + (err.message || 'erro desconhecido'), 'error');
-        }
-      });
-    });
-
     resetPasswordBtn.addEventListener('click', async function () {
       const creds = readCredentials();
       if (!creds) {
@@ -495,7 +436,6 @@
             throw result.error;
           }
 
-          setWidgetOpen(true);
           setStatus(statusEl, 'Email enviado. Abra o link para definir sua senha.', 'ok');
         } catch (err) {
           setStatus(statusEl, 'Falha ao enviar email de senha: ' + (err.message || 'erro desconhecido'), 'error');
@@ -515,7 +455,7 @@
       }
 
       await withButtonsDisabled(async function () {
-        setStatus(statusEl, 'Entrando com senha...', '');
+        setStatus(statusEl, 'Entrando...', '');
         try {
           const result = await client.auth.signInWithPassword({
             email: creds.email,
@@ -526,10 +466,9 @@
             throw result.error;
           }
 
-          setWidgetOpen(true);
           setStatus(statusEl, 'Login realizado com sucesso.', 'ok');
         } catch (err) {
-          setStatus(statusEl, 'Falha no login com senha: ' + (err.message || 'erro desconhecido'), 'error');
+          setStatus(statusEl, 'Falha no login: ' + (err.message || 'erro desconhecido'), 'error');
         }
       });
     });
@@ -560,9 +499,8 @@
           }
 
           if (result.data && result.data.user && Array.isArray(result.data.user.identities) && result.data.user.identities.length === 0) {
-            setStatus(statusEl, 'Esse email ja possui conta. Use "Entrar por link magico" e depois "Definir senha".', 'error');
+            setStatus(statusEl, 'Email ja cadastrado. Use "Ja tenho conta" ou "Esqueci/definir senha".', 'error');
           } else if (result.data && result.data.session) {
-            setWidgetOpen(true);
             setStatus(statusEl, 'Conta criada e login ativo.', 'ok');
           } else {
             setStatus(statusEl, 'Conta criada. Verifique seu email para confirmar, se solicitado.', 'ok');
@@ -600,19 +538,16 @@
   function start() {
     injectStyles();
     const widget = createWidget();
+    mountWidget(widget);
     const statusEl = widget.querySelector('#auth-status');
 
     if (!window.supabase || !window.supabase.createClient) {
       setStatus(statusEl, 'SDK do Supabase nao foi carregado.', 'error');
-      widget.classList.add('auth-open');
-      widget.classList.remove('auth-collapsed');
       return;
     }
 
     if (!hasConfig) {
       setStatus(statusEl, 'Configure supabase-config.js para ativar o login.', 'error');
-      widget.classList.add('auth-open');
-      widget.classList.remove('auth-collapsed');
       return;
     }
 
