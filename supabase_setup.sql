@@ -307,6 +307,75 @@ on public.study_completions
 for delete
 using (auth.uid() = user_id);
 
+-- Comentarios e oracoes publicas por estudo
+create table if not exists public.study_comments (
+  id uuid primary key default gen_random_uuid(),
+  study_id text not null,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  entry_type text not null default 'comment' check (entry_type in ('comment', 'prayer')),
+  content text,
+  audio_url text,
+  created_at timestamptz not null default now(),
+  constraint study_comments_content_or_audio check (
+    nullif(trim(coalesce(content, '')), '') is not null
+    or audio_url is not null
+  )
+);
+
+create index if not exists study_comments_study_created_idx
+  on public.study_comments (study_id, created_at desc);
+
+alter table public.study_comments enable row level security;
+
+drop policy if exists "study_comments_public_read" on public.study_comments;
+create policy "study_comments_public_read"
+on public.study_comments
+for select
+using (true);
+
+drop policy if exists "study_comments_insert_own" on public.study_comments;
+create policy "study_comments_insert_own"
+on public.study_comments
+for insert
+to authenticated
+with check (auth.uid() = user_id);
+
+drop policy if exists "study_comments_update_own_or_admin" on public.study_comments;
+create policy "study_comments_update_own_or_admin"
+on public.study_comments
+for update
+to authenticated
+using (
+  auth.uid() = user_id
+  or exists (
+    select 1
+    from public.admin_users a
+    where a.user_id = auth.uid()
+  )
+)
+with check (
+  auth.uid() = user_id
+  or exists (
+    select 1
+    from public.admin_users a
+    where a.user_id = auth.uid()
+  )
+);
+
+drop policy if exists "study_comments_delete_own_or_admin" on public.study_comments;
+create policy "study_comments_delete_own_or_admin"
+on public.study_comments
+for delete
+to authenticated
+using (
+  auth.uid() = user_id
+  or exists (
+    select 1
+    from public.admin_users a
+    where a.user_id = auth.uid()
+  )
+);
+
 -- Storage: bucket de fotos de perfil (avatars)
 insert into storage.buckets (id, name, public)
 values ('avatars', 'avatars', true)
@@ -350,4 +419,70 @@ to authenticated
 using (
   bucket_id = 'avatars'
   and (storage.foldername(name))[1] = auth.uid()::text
+);
+
+-- Storage: audios de comentarios/oracoes
+insert into storage.buckets (id, name, public)
+values ('study-audio', 'study-audio', true)
+on conflict (id) do nothing;
+
+drop policy if exists "study_audio_public_read" on storage.objects;
+create policy "study_audio_public_read"
+on storage.objects
+for select
+using (bucket_id = 'study-audio');
+
+drop policy if exists "study_audio_insert_own" on storage.objects;
+create policy "study_audio_insert_own"
+on storage.objects
+for insert
+to authenticated
+with check (
+  bucket_id = 'study-audio'
+  and (storage.foldername(name))[1] = auth.uid()::text
+);
+
+drop policy if exists "study_audio_update_own_or_admin" on storage.objects;
+create policy "study_audio_update_own_or_admin"
+on storage.objects
+for update
+to authenticated
+using (
+  bucket_id = 'study-audio'
+  and (
+    (storage.foldername(name))[1] = auth.uid()::text
+    or exists (
+      select 1
+      from public.admin_users a
+      where a.user_id = auth.uid()
+    )
+  )
+)
+with check (
+  bucket_id = 'study-audio'
+  and (
+    (storage.foldername(name))[1] = auth.uid()::text
+    or exists (
+      select 1
+      from public.admin_users a
+      where a.user_id = auth.uid()
+    )
+  )
+);
+
+drop policy if exists "study_audio_delete_own_or_admin" on storage.objects;
+create policy "study_audio_delete_own_or_admin"
+on storage.objects
+for delete
+to authenticated
+using (
+  bucket_id = 'study-audio'
+  and (
+    (storage.foldername(name))[1] = auth.uid()::text
+    or exists (
+      select 1
+      from public.admin_users a
+      where a.user_id = auth.uid()
+    )
+  )
 );

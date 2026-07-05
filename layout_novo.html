@@ -393,6 +393,172 @@
       white-space: pre-wrap;
     }
 
+    .community-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .community-auth {
+      font-size: 13px;
+      color: #3e5855;
+      background: #f5faf8;
+      border: 1px solid #d6e5e0;
+      border-radius: 999px;
+      min-height: 30px;
+      padding: 0 11px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .community-compose {
+      border: 1px solid #d7e0dc;
+      border-radius: 14px;
+      padding: 14px;
+      background: #fafdfc;
+      display: grid;
+      gap: 10px;
+    }
+
+    .community-grid {
+      display: grid;
+      grid-template-columns: 170px 1fr;
+      gap: 10px;
+    }
+
+    .community-compose select,
+    .community-compose textarea,
+    .community-compose input[type="file"] {
+      width: 100%;
+      border: 1px solid #c9d7d2;
+      border-radius: 10px;
+      background: #fff;
+      color: #193332;
+      padding: 10px 12px;
+      font: inherit;
+    }
+
+    .community-compose textarea {
+      min-height: 110px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .community-audio-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .audio-state {
+      font-size: 12px;
+      color: #486663;
+    }
+
+    .community-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .community-item {
+      border: 1px solid #d5dfdb;
+      border-radius: 14px;
+      background: #fff;
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .community-item-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .community-author {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .community-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #126b5f;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-size: cover;
+      background-position: center;
+      flex: 0 0 auto;
+    }
+
+    .community-author-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1b3433;
+      max-width: 280px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .community-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #57706d;
+      font-size: 12px;
+    }
+
+    .community-type {
+      min-height: 24px;
+      border-radius: 999px;
+      border: 1px solid #cfe0dc;
+      padding: 0 8px;
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      color: #1b5e55;
+      background: #eef7f5;
+    }
+
+    .community-text {
+      margin: 0;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+      color: #243837;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .community-item audio {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .community-empty {
+      border: 1px dashed #cad6d2;
+      border-radius: 12px;
+      padding: 12px;
+      background: #f8fbf9;
+      color: #526866;
+      font-size: 14px;
+    }
+
     .footer-note {
       text-align: center;
       color: #637271;
@@ -413,6 +579,10 @@
 
     @media (max-width: 980px) {
       .scripture-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .community-grid {
         grid-template-columns: 1fr;
       }
 
@@ -519,6 +689,39 @@
       </div>
     </section>
 
+    <section class="card stack" id="community-card">
+      <div class="community-head">
+        <div class="section-title" style="margin:0">
+          <h2>Comentarios e Oracoes</h2>
+          <span>Comunidade</span>
+        </div>
+        <div class="community-auth" id="community-auth-state">Entre para participar</div>
+      </div>
+
+      <div class="community-compose">
+        <div class="community-grid">
+          <select id="community-type">
+            <option value="comment">Comentario</option>
+            <option value="prayer">Oracao</option>
+          </select>
+          <textarea id="community-text" placeholder="Escreva seu comentario ou oracao para este estudo..."></textarea>
+        </div>
+
+        <div class="community-audio-row">
+          <button class="ghost-btn" id="audio-record-btn" type="button">Gravar audio</button>
+          <input id="audio-file" type="file" accept="audio/*" />
+          <span class="audio-state" id="audio-state">Sem audio selecionado.</span>
+        </div>
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between">
+          <span class="audio-state" id="community-submit-status"></span>
+          <button class="btn" id="community-submit" type="button">Publicar</button>
+        </div>
+      </div>
+
+      <div class="community-list" id="community-list"></div>
+    </section>
+
     <section class="status" id="status">Carregando estudo...</section>
     <p class="footer-note">Visual oficial do projeto com leitura a partir dos mesmos arquivos markdown.</p>
   </main>
@@ -537,6 +740,16 @@
     let resolvedImageDir = 'Atos/At_1/img';
     let resolvedAdditionalUrl = '';
     let studiesIndex = [];
+    let studyPublicId = '';
+
+    const supabaseConfig = window.BIBLIA_SUPABASE_CONFIG || null;
+    const supabaseClient = (supabaseConfig && supabaseConfig.url && supabaseConfig.anonKey)
+      ? window.supabase.createClient(supabaseConfig.url, supabaseConfig.anonKey)
+      : null;
+    let currentSessionUser = null;
+    let mediaRecorder = null;
+    let mediaRecorderChunks = [];
+    let recordedAudioBlob = null;
 
     function deriveImageDirFromMarkdownPath(markdownPath) {
       const normalized = (markdownPath || '').replace(/\\/g, '/');
@@ -732,6 +945,284 @@
       el.style.color = isError ? '#7b3f3f' : '#4f6361';
     }
 
+    function getInitials(value) {
+      const text = String(value || '').trim();
+      if (!text) return '?';
+      const parts = text.split(/\s+/).filter(Boolean);
+      if (parts.length >= 2) {
+        return (parts[0][0] + parts[1][0]).toUpperCase();
+      }
+      return text.slice(0, 2).toUpperCase();
+    }
+
+    function formatDateTimeBR(value) {
+      try {
+        return new Date(value).toLocaleString('pt-BR');
+      } catch (_) {
+        return '';
+      }
+    }
+
+    function setCommunitySubmitStatus(message, isError) {
+      const el = document.getElementById('community-submit-status');
+      if (!el) return;
+      el.textContent = message || '';
+      el.style.color = isError ? '#8a3c3c' : '#446663';
+    }
+
+    function setAudioState(message) {
+      const el = document.getElementById('audio-state');
+      if (!el) return;
+      el.textContent = message;
+    }
+
+    function updateCommunityAuthState() {
+      const el = document.getElementById('community-auth-state');
+      if (!el) return;
+      if (currentSessionUser) {
+        el.textContent = 'Conectado: ' + (currentSessionUser.email || 'usuario');
+      } else {
+        el.textContent = 'Entre para publicar comentario/oracao';
+      }
+    }
+
+    async function fetchProfileMap(userIds) {
+      const map = {};
+      if (!supabaseClient || !userIds.length) {
+        return map;
+      }
+      const { data } = await supabaseClient
+        .from('profiles')
+        .select('id, full_name, avatar_url')
+        .in('id', userIds);
+      (data || []).forEach(function (row) {
+        map[row.id] = row;
+      });
+      return map;
+    }
+
+    function renderCommunityItems(items, profileMap) {
+      const list = document.getElementById('community-list');
+      if (!list) return;
+
+      if (!items.length) {
+        list.innerHTML = '<div class="community-empty">Ainda nao ha comentarios/oracoes neste estudo. Seja o primeiro a compartilhar.</div>';
+        return;
+      }
+
+      const html = items.map(function (item) {
+        const profile = profileMap[item.user_id] || {};
+        const author = profile.full_name || 'Usuario';
+        const avatarUrl = profile.avatar_url || '';
+        const initials = getInitials(author);
+        const dateLabel = formatDateTimeBR(item.created_at);
+        const typeLabel = item.entry_type === 'prayer' ? 'Oracao' : 'Comentario';
+        const safeText = item.content ? item.content
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;') : '';
+        const avatarStyle = avatarUrl
+          ? ' style="background-image:url(\'' + avatarUrl.replace(/'/g, '%27') + '\')"'
+          : '';
+
+        return (
+          '<article class="community-item">' +
+            '<div class="community-item-head">' +
+              '<div class="community-author">' +
+                '<span class="community-avatar"' + avatarStyle + '>' + (avatarUrl ? '' : initials) + '</span>' +
+                '<span class="community-author-name">' + author + '</span>' +
+              '</div>' +
+              '<span class="community-meta"><span class="community-type">' + typeLabel + '</span> ' + dateLabel + '</span>' +
+            '</div>' +
+            (safeText ? '<p class="community-text">' + safeText + '</p>' : '') +
+            (item.audio_url ? '<audio controls preload="none" src="' + item.audio_url + '"></audio>' : '') +
+          '</article>'
+        );
+      }).join('');
+
+      list.innerHTML = html;
+    }
+
+    async function loadCommunityItems() {
+      const list = document.getElementById('community-list');
+      if (!list) return;
+
+      if (!supabaseClient || !studyPublicId) {
+        list.innerHTML = '<div class="community-empty">Supabase nao configurado para carregar comentarios.</div>';
+        return;
+      }
+
+      list.innerHTML = '<div class="community-empty">Carregando comentarios e oracoes...</div>';
+
+      const { data, error } = await supabaseClient
+        .from('study_comments')
+        .select('id, study_id, user_id, entry_type, content, audio_url, created_at')
+        .eq('study_id', studyPublicId)
+        .order('created_at', { ascending: false })
+        .limit(200);
+
+      if (error) {
+        list.innerHTML = '<div class="community-empty">Nao foi possivel carregar os comentarios: ' + error.message + '</div>';
+        return;
+      }
+
+      const items = data || [];
+      const userIds = Array.from(new Set(items.map(function (item) { return item.user_id; }).filter(Boolean)));
+      const profileMap = await fetchProfileMap(userIds);
+      renderCommunityItems(items, profileMap);
+    }
+
+    async function uploadCommunityAudio(fileOrBlob) {
+      if (!supabaseClient || !currentSessionUser || !fileOrBlob) {
+        return '';
+      }
+      const extensionFromType = (fileOrBlob.type || '').split('/')[1] || 'webm';
+      const filename = Date.now() + '_' + Math.random().toString(36).slice(2) + '.' + extensionFromType;
+      const path = currentSessionUser.id + '/' + encodeURIComponent(studyPublicId) + '/' + filename;
+      const { error: uploadError } = await supabaseClient
+        .storage
+        .from('study-audio')
+        .upload(path, fileOrBlob, {
+          upsert: false,
+          contentType: fileOrBlob.type || 'audio/webm'
+        });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data } = supabaseClient.storage.from('study-audio').getPublicUrl(path);
+      return (data && data.publicUrl) || '';
+    }
+
+    async function submitCommunityPost() {
+      if (!supabaseClient) {
+        setCommunitySubmitStatus('Supabase nao configurado neste ambiente.', true);
+        return;
+      }
+
+      if (!currentSessionUser) {
+        setCommunitySubmitStatus('Entre na sua conta para publicar.', true);
+        return;
+      }
+
+      const typeEl = document.getElementById('community-type');
+      const textEl = document.getElementById('community-text');
+      const fileEl = document.getElementById('audio-file');
+
+      const entryType = typeEl ? typeEl.value : 'comment';
+      const content = textEl ? textEl.value.trim() : '';
+      const pickedFile = fileEl && fileEl.files && fileEl.files[0] ? fileEl.files[0] : null;
+      const audioSource = recordedAudioBlob || pickedFile;
+
+      if (!content && !audioSource) {
+        setCommunitySubmitStatus('Escreva uma mensagem ou anexe/gravar um audio.', true);
+        return;
+      }
+
+      setCommunitySubmitStatus('Publicando...', false);
+
+      try {
+        const audioUrl = audioSource ? await uploadCommunityAudio(audioSource) : '';
+        const payload = {
+          study_id: studyPublicId,
+          user_id: currentSessionUser.id,
+          entry_type: entryType,
+          content: content || null,
+          audio_url: audioUrl || null
+        };
+
+        const { error } = await supabaseClient.from('study_comments').insert(payload);
+        if (error) {
+          throw error;
+        }
+
+        if (textEl) textEl.value = '';
+        if (fileEl) fileEl.value = '';
+        recordedAudioBlob = null;
+        setAudioState('Sem audio selecionado.');
+        setCommunitySubmitStatus('Publicado com sucesso.', false);
+        await loadCommunityItems();
+      } catch (err) {
+        setCommunitySubmitStatus('Falha ao publicar: ' + (err.message || String(err)), true);
+      }
+    }
+
+    async function toggleAudioRecording() {
+      const btn = document.getElementById('audio-record-btn');
+      if (!btn) return;
+
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+        return;
+      }
+
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === 'undefined') {
+        setAudioState('Gravacao nao suportada neste navegador. Use o envio de arquivo.');
+        return;
+      }
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorderChunks = [];
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = function (evt) {
+          if (evt.data && evt.data.size > 0) {
+            mediaRecorderChunks.push(evt.data);
+          }
+        };
+        mediaRecorder.onstop = function () {
+          const type = mediaRecorder.mimeType || 'audio/webm';
+          recordedAudioBlob = new Blob(mediaRecorderChunks, { type: type });
+          setAudioState('Audio gravado pronto para envio.');
+          btn.textContent = 'Gravar audio';
+          stream.getTracks().forEach(function (track) { track.stop(); });
+        };
+        mediaRecorder.start();
+        btn.textContent = 'Parar gravacao';
+        setAudioState('Gravando audio...');
+      } catch (err) {
+        setAudioState('Nao foi possivel iniciar gravacao: ' + (err.message || String(err)));
+      }
+    }
+
+    async function initCommunity() {
+      const submitBtn = document.getElementById('community-submit');
+      const recordBtn = document.getElementById('audio-record-btn');
+      const fileEl = document.getElementById('audio-file');
+
+      if (submitBtn) {
+        submitBtn.addEventListener('click', submitCommunityPost);
+      }
+      if (recordBtn) {
+        recordBtn.addEventListener('click', toggleAudioRecording);
+      }
+      if (fileEl) {
+        fileEl.addEventListener('change', function () {
+          if (fileEl.files && fileEl.files[0]) {
+            recordedAudioBlob = null;
+            setAudioState('Arquivo selecionado: ' + fileEl.files[0].name);
+          } else {
+            setAudioState('Sem audio selecionado.');
+          }
+        });
+      }
+
+      if (supabaseClient) {
+        const { data } = await supabaseClient.auth.getSession();
+        currentSessionUser = data && data.session ? data.session.user : null;
+        updateCommunityAuthState();
+        supabaseClient.auth.onAuthStateChange(function (_event, session) {
+          currentSessionUser = session ? session.user : null;
+          updateCommunityAuthState();
+        });
+      } else {
+        updateCommunityAuthState();
+      }
+
+      await loadCommunityItems();
+    }
+
     async function renderFromMarkdown() {
       try {
         await resolveStudyConfig();
@@ -781,12 +1272,16 @@
         }
 
         renderImages(title, imageNames);
+        studyPublicId = (resolvedStudy && resolvedStudy.id)
+          ? resolvedStudy.id
+          : ('md:' + resolvedMdPath.replace(/\\/g, '/'));
         updatePrevNextLinks();
         updateCrossLinks();
         balanceScriptureFonts();
         if (document.fonts && document.fonts.ready) {
           document.fonts.ready.then(balanceScriptureFonts);
         }
+        await initCommunity();
         setStatus('Estudo carregado com sucesso a partir de ' + resolvedMdPath + '.', false);
       } catch (error) {
         setStatus('Erro ao carregar estudo: ' + error.message + '. Abra via servidor local no VS Code.', true);

@@ -36,6 +36,8 @@ No painel: SQL Editor
    - campo bairro e campo cpf (completo) em user_private_data
    - bucket de fotos "avatars" (Storage) com politicas RLS por usuario
    - tabela study_completions (progresso de estudos: estrela de concluido)
+   - tabela study_comments (comentarios e oracoes por estudo)
+   - bucket "study-audio" (Storage) para audio de comentarios/oracoes
 
 ## 4) Tornar seu usuario admin
 Depois do seu primeiro login: 
@@ -67,4 +69,4 @@ on conflict (user_id) do nothing;
 - Nunca use service_role no frontend.
 - A anon key pode ficar no frontend.
 - Se o link do email abrir e nao logar, quase sempre falta ajustar Redirect URLs.
-- CPF nao e salvo em texto puro: o frontend envia hash + 4 ultimos digitos para user_private_data.
+- CPF e salvo em user_private_data.cpf conforme a regra atual solicitada no projeto.
