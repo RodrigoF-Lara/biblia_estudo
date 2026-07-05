@@ -60,9 +60,18 @@
       '<div class="auth-logged-out">',
       '  <div class="auth-row">',
       '    <input class="auth-input" id="auth-email" type="email" placeholder="Seu email" autocomplete="email"/>',
-      '    <button class="auth-btn" id="auth-login">Entrar</button>',
       '  </div>',
-      '  <p class="auth-meta">Enviamos um link magico para seu email.</p>',
+      '  <div class="auth-row" style="margin-top:8px">',
+      '    <input class="auth-input" id="auth-password" type="password" placeholder="Sua senha" autocomplete="current-password"/>',
+      '  </div>',
+      '  <div class="auth-row" style="margin-top:8px">',
+      '    <button class="auth-btn" id="auth-login-password">Entrar com senha</button>',
+      '    <button class="auth-btn secondary" id="auth-signup-password">Criar conta</button>',
+      '  </div>',
+      '  <div class="auth-row" style="margin-top:8px">',
+      '    <button class="auth-btn secondary" id="auth-login">Entrar por link magico</button>',
+      '  </div>',
+      '  <p class="auth-meta">Depois do login com senha, a sessao fica ativa no navegador.</p>',
       '</div>',
       '<div class="auth-logged-in" style="display:none">',
       '  <p class="auth-meta" id="auth-user"></p>',
@@ -141,7 +150,10 @@
     const loggedOut = widget.querySelector('.auth-logged-out');
     const loggedIn = widget.querySelector('.auth-logged-in');
     const emailInput = widget.querySelector('#auth-email');
+    const passwordInput = widget.querySelector('#auth-password');
     const loginBtn = widget.querySelector('#auth-login');
+    const loginPasswordBtn = widget.querySelector('#auth-login-password');
+    const signupPasswordBtn = widget.querySelector('#auth-signup-password');
     const logoutBtn = widget.querySelector('#auth-logout');
     const toggleProfileBtn = widget.querySelector('#auth-toggle-profile');
     const profileForm = widget.querySelector('#auth-profile-form');
@@ -342,6 +354,28 @@
       }
     }
 
+    function readCredentials() {
+      const email = (emailInput.value || '').trim();
+      const password = (passwordInput.value || '').trim();
+      if (!email) {
+        setStatus(statusEl, 'Digite um email valido.', 'error');
+        emailInput.focus();
+        return null;
+      }
+      return { email, password };
+    }
+
+    function withButtonsDisabled(callback) {
+      loginBtn.disabled = true;
+      loginPasswordBtn.disabled = true;
+      signupPasswordBtn.disabled = true;
+      return callback().finally(function () {
+        loginBtn.disabled = false;
+        loginPasswordBtn.disabled = false;
+        signupPasswordBtn.disabled = false;
+      });
+    }
+
     function renderSession(session) {
       const user = session && session.user ? session.user : null;
       if (user) {
@@ -377,33 +411,98 @@
     });
 
     loginBtn.addEventListener('click', async function () {
-      const email = (emailInput.value || '').trim();
-      if (!email) {
-        setStatus(statusEl, 'Digite um email valido.', 'error');
-        emailInput.focus();
+      const creds = readCredentials();
+      if (!creds) {
         return;
       }
 
-      loginBtn.disabled = true;
-      setStatus(statusEl, 'Enviando link de acesso...', '');
-      try {
-        const redirect = config.defaultRedirectTo || (window.location.origin + window.location.pathname);
-        const result = await client.auth.signInWithOtp({
-          email: email,
-          options: { emailRedirectTo: redirect }
-        });
+      await withButtonsDisabled(async function () {
+        setStatus(statusEl, 'Enviando link de acesso...', '');
+        try {
+          const redirect = config.defaultRedirectTo || (window.location.origin + window.location.pathname);
+          const result = await client.auth.signInWithOtp({
+            email: creds.email,
+            options: { emailRedirectTo: redirect }
+          });
 
-        if (result.error) {
-          throw result.error;
+          if (result.error) {
+            throw result.error;
+          }
+
+          setWidgetOpen(true);
+          setStatus(statusEl, 'Link enviado. Abra seu email e clique para entrar.', 'ok');
+        } catch (err) {
+          setStatus(statusEl, 'Falha ao enviar link: ' + (err.message || 'erro desconhecido'), 'error');
         }
+      });
+    });
 
-        setWidgetOpen(true);
-        setStatus(statusEl, 'Link enviado. Abra seu email e clique para entrar.', 'ok');
-      } catch (err) {
-        setStatus(statusEl, 'Falha ao enviar link: ' + (err.message || 'erro desconhecido'), 'error');
-      } finally {
-        loginBtn.disabled = false;
+    loginPasswordBtn.addEventListener('click', async function () {
+      const creds = readCredentials();
+      if (!creds) {
+        return;
       }
+      if (!creds.password || creds.password.length < 6) {
+        setStatus(statusEl, 'Digite sua senha (minimo de 6 caracteres).', 'error');
+        passwordInput.focus();
+        return;
+      }
+
+      await withButtonsDisabled(async function () {
+        setStatus(statusEl, 'Entrando com senha...', '');
+        try {
+          const result = await client.auth.signInWithPassword({
+            email: creds.email,
+            password: creds.password
+          });
+
+          if (result.error) {
+            throw result.error;
+          }
+
+          setWidgetOpen(true);
+          setStatus(statusEl, 'Login realizado com sucesso.', 'ok');
+        } catch (err) {
+          setStatus(statusEl, 'Falha no login com senha: ' + (err.message || 'erro desconhecido'), 'error');
+        }
+      });
+    });
+
+    signupPasswordBtn.addEventListener('click', async function () {
+      const creds = readCredentials();
+      if (!creds) {
+        return;
+      }
+      if (!creds.password || creds.password.length < 6) {
+        setStatus(statusEl, 'Para criar conta, use senha com minimo de 6 caracteres.', 'error');
+        passwordInput.focus();
+        return;
+      }
+
+      await withButtonsDisabled(async function () {
+        setStatus(statusEl, 'Criando conta...', '');
+        try {
+          const redirect = config.defaultRedirectTo || (window.location.origin + window.location.pathname);
+          const result = await client.auth.signUp({
+            email: creds.email,
+            password: creds.password,
+            options: { emailRedirectTo: redirect }
+          });
+
+          if (result.error) {
+            throw result.error;
+          }
+
+          if (result.data && result.data.session) {
+            setWidgetOpen(true);
+            setStatus(statusEl, 'Conta criada e login ativo.', 'ok');
+          } else {
+            setStatus(statusEl, 'Conta criada. Verifique seu email para confirmar, se solicitado.', 'ok');
+          }
+        } catch (err) {
+          setStatus(statusEl, 'Falha ao criar conta: ' + (err.message || 'erro desconhecido'), 'error');
+        }
+      });
     });
 
     logoutBtn.addEventListener('click', async function () {

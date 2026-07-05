@@ -24,7 +24,8 @@ No painel: Authentication > URL Configuration
 No painel: Authentication > Providers > Email
 
 1. Deixe o provedor Email habilitado.
-2. Magic Link funciona pelo botao "Entrar" do widget.
+2. Para login sem link por email toda vez, habilite "Email + Password".
+3. Magic Link continua opcional pelo botao "Entrar por link magico" do widget.
 
 ## 3) Criar tabelas e politicas (RLS)
 No painel: SQL Editor
