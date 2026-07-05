@@ -41,6 +41,15 @@
       align-items: start;
     }
 
+    .account-menu-wrap {
+      width: calc(420mm + 16px);
+      max-width: 100%;
+      margin: 0 auto 12px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
     .page {
       width: 210mm;
       height: 297mm;
@@ -470,6 +479,10 @@
         overflow-x: auto;
       }
 
+      .account-menu-wrap {
+        width: 100%;
+      }
+
       .spread {
         display: flex;
         gap: 12px;
@@ -546,6 +559,9 @@
         background: white;
         padding: 0;
       }
+      .account-menu-wrap {
+        display: none;
+      }
       .spread {
         display: block;
       }
@@ -559,6 +575,10 @@
   </style>
 </head>
 <body>
+  <div class="account-menu-wrap">
+    <div id="auth-menu-slot"></div>
+  </div>
+
   <main class="spread">
     <section class="page" id="page-left">
       <header class="header" id="header-left">
