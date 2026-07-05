@@ -156,6 +156,19 @@
     let currentUser = getCurrentUser();
 
     while (!currentUser && Date.now() < deadline) {
+      if (context.client && context.client.auth && typeof context.client.auth.getSession === 'function') {
+        try {
+          const sessionRes = await context.client.auth.getSession();
+          currentUser = sessionRes && sessionRes.data && sessionRes.data.session
+            ? sessionRes.data.session.user
+            : null;
+        } catch (_err) {
+          currentUser = null;
+        }
+        if (currentUser) {
+          break;
+        }
+      }
       await sleep(100);
       currentUser = getCurrentUser();
     }
