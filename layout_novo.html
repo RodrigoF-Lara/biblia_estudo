@@ -255,43 +255,44 @@
       letter-spacing: 0.1px;
     }
 
-    .study-audio-wrap {
-      width: min(460px, 100%);
-      display: grid;
+    .section-title-main {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .translation-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       gap: 8px;
-      justify-items: start;
+      flex-wrap: wrap;
     }
 
-    .study-audio-toggle {
-      cursor: pointer;
-      font: inherit;
-      color: #f6fbfa;
-      justify-content: flex-start;
-      min-height: 34px;
-      text-align: left;
-      width: auto;
-      transition: background-color 0.2s ease, border-color 0.2s ease;
+    .inline-listen-btn {
+      min-height: 30px;
+      height: 30px;
+      padding: 0 11px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
     }
 
-    .study-audio-toggle:hover {
-      background: rgba(255, 255, 255, 0.24);
-      border-color: rgba(255, 255, 255, 0.54);
-    }
-
-    .study-audio-player {
+    .inline-audio-player {
       display: none;
-      border: 1px solid rgba(255, 255, 255, 0.35);
+      border: 1px solid #cfe0dc;
       border-radius: 12px;
-      background: rgba(8, 40, 35, 0.35);
-      padding: 8px;
-      width: 100%;
+      background: #f7fbfa;
+      padding: 10px;
+      width: min(460px, 100%);
     }
 
-    .study-audio-player.open {
+    .inline-audio-player.open {
       display: block;
     }
 
-    .study-audio-player audio {
+    .inline-audio-player audio {
       width: 100%;
     }
 
@@ -350,34 +351,6 @@
       color: #273536;
       font-size: 16px;
       line-height: 1.67;
-    }
-
-    .study-commentary-audio {
-      display: grid;
-      gap: 8px;
-      justify-items: start;
-    }
-
-    .study-commentary-audio-toggle {
-      cursor: pointer;
-      width: auto;
-    }
-
-    .study-commentary-audio-player {
-      display: none;
-      border: 1px solid #cfe0dc;
-      border-radius: 12px;
-      background: #f7fbfa;
-      padding: 10px;
-      width: min(460px, 100%);
-    }
-
-    .study-commentary-audio-player.open {
-      display: block;
-    }
-
-    .study-commentary-audio-player audio {
-      width: 100%;
     }
 
     .scripture-grid {
@@ -902,11 +875,7 @@
         min-height: 30px;
       }
 
-      .study-audio-player {
-        width: 100%;
-      }
-
-      .study-commentary-audio-player {
+      .inline-audio-player {
         width: 100%;
       }
 
@@ -939,12 +908,6 @@
       <p id="hero-subtitle">Visualizacao alternativa com os mesmos dados dos arquivos markdown.</p>
       <div class="hero-meta">
         <span class="pill" id="pill-ref">Referencia: --</span>
-        <div class="study-audio-wrap" id="study-audio-wrap" hidden>
-          <button class="pill study-audio-toggle" id="study-audio-toggle" type="button" aria-expanded="false">Ouvir leitura do texto biblico</button>
-          <div class="study-audio-player" id="study-audio-player-wrap">
-            <audio id="study-audio-player" controls preload="metadata"></audio>
-          </div>
-        </div>
       </div>
     </section>
 
@@ -956,7 +919,13 @@
 
       <div class="scripture-grid">
         <article class="translation">
-          <button class="translation-toggle" type="button" data-short="NVI" data-full="Nova Versao Internacional" data-expanded="false">NVI</button>
+          <div class="translation-head">
+            <button class="translation-toggle" type="button" data-short="NVI" data-full="Nova Versao Internacional" data-expanded="false">NVI</button>
+            <button class="ghost-btn inline-listen-btn" id="study-audio-toggle" type="button" aria-expanded="false" hidden>Ouvir &#128266;</button>
+          </div>
+          <div class="inline-audio-player" id="study-audio-player-wrap">
+            <audio id="study-audio-player" controls preload="metadata"></audio>
+          </div>
           <p id="nvi-content"></p>
         </article>
 
@@ -974,16 +943,16 @@
 
     <section class="card stack">
       <div class="section-title">
-        <h2>Estudo Biblico</h2>
+        <div class="section-title-main">
+          <h2>Estudo Biblico</h2>
+          <button class="ghost-btn inline-listen-btn" id="study-commentary-audio-toggle" type="button" aria-expanded="false" hidden>Ouvir &#128266;</button>
+        </div>
         <span>Conteudo Integral</span>
       </div>
-      <p class="text-block" id="estudo-content"></p>
-      <div class="study-commentary-audio" id="study-commentary-audio-wrap" hidden>
-        <button class="ghost-btn study-commentary-audio-toggle" id="study-commentary-audio-toggle" type="button" aria-expanded="false">Ouvir audio do estudo biblico</button>
-        <div class="study-commentary-audio-player" id="study-commentary-audio-player-wrap">
-          <audio id="study-commentary-audio-player" controls preload="metadata"></audio>
-        </div>
+      <div class="inline-audio-player" id="study-commentary-audio-player-wrap">
+        <audio id="study-commentary-audio-player" controls preload="metadata"></audio>
       </div>
+      <p class="text-block" id="estudo-content"></p>
       <a class="btn" id="additional-link" href="#" target="_blank" rel="noreferrer" hidden>Abrir estudo adicional</a>
     </section>
 
@@ -1230,16 +1199,15 @@
     }
 
     function setStudyAudioPlayer(visible, audioPath) {
-      const wrap = document.getElementById('study-audio-wrap');
       const toggle = document.getElementById('study-audio-toggle');
       const playerWrap = document.getElementById('study-audio-player-wrap');
       const player = document.getElementById('study-audio-player');
-      if (!wrap || !toggle || !playerWrap || !player) {
+      if (!toggle || !playerWrap || !player) {
         return;
       }
 
       if (!visible || !audioPath) {
-        wrap.hidden = true;
+        toggle.hidden = true;
         toggle.setAttribute('aria-expanded', 'false');
         playerWrap.classList.remove('open');
         player.pause();
@@ -1248,8 +1216,7 @@
         return;
       }
 
-      wrap.hidden = false;
-      toggle.textContent = 'Ouvir leitura do texto biblico';
+      toggle.hidden = false;
       player.src = audioPath;
     }
 
@@ -1268,16 +1235,15 @@
     }
 
     function setStudyCommentaryAudioPlayer(visible, audioPath) {
-      const wrap = document.getElementById('study-commentary-audio-wrap');
       const toggle = document.getElementById('study-commentary-audio-toggle');
       const playerWrap = document.getElementById('study-commentary-audio-player-wrap');
       const player = document.getElementById('study-commentary-audio-player');
-      if (!wrap || !toggle || !playerWrap || !player) {
+      if (!toggle || !playerWrap || !player) {
         return;
       }
 
       if (!visible || !audioPath) {
-        wrap.hidden = true;
+        toggle.hidden = true;
         toggle.setAttribute('aria-expanded', 'false');
         playerWrap.classList.remove('open');
         player.pause();
@@ -1286,8 +1252,7 @@
         return;
       }
 
-      wrap.hidden = false;
-      toggle.textContent = 'Ouvir audio do estudo biblico';
+      toggle.hidden = false;
       player.src = audioPath;
     }
 
@@ -1317,9 +1282,6 @@
         const nextOpen = !playerWrap.classList.contains('open');
         playerWrap.classList.toggle('open', nextOpen);
         toggle.setAttribute('aria-expanded', String(nextOpen));
-        toggle.textContent = nextOpen
-          ? 'Ocultar leitura em audio'
-          : 'Ouvir leitura do texto biblico';
 
         if (!nextOpen) {
           player.pause();
@@ -1339,9 +1301,6 @@
         const nextOpen = !playerWrap.classList.contains('open');
         playerWrap.classList.toggle('open', nextOpen);
         toggle.setAttribute('aria-expanded', String(nextOpen));
-        toggle.textContent = nextOpen
-          ? 'Ocultar audio do estudo biblico'
-          : 'Ouvir audio do estudo biblico';
 
         if (!nextOpen) {
           player.pause();
