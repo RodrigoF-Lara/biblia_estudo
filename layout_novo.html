@@ -352,6 +352,34 @@
       line-height: 1.67;
     }
 
+    .study-commentary-audio {
+      display: grid;
+      gap: 8px;
+      justify-items: start;
+    }
+
+    .study-commentary-audio-toggle {
+      cursor: pointer;
+      width: auto;
+    }
+
+    .study-commentary-audio-player {
+      display: none;
+      border: 1px solid #cfe0dc;
+      border-radius: 12px;
+      background: #f7fbfa;
+      padding: 10px;
+      width: min(460px, 100%);
+    }
+
+    .study-commentary-audio-player.open {
+      display: block;
+    }
+
+    .study-commentary-audio-player audio {
+      width: 100%;
+    }
+
     .scripture-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -878,6 +906,10 @@
         width: 100%;
       }
 
+      .study-commentary-audio-player {
+        width: 100%;
+      }
+
       .quick-grid {
         grid-template-columns: 1fr;
       }
@@ -946,6 +978,12 @@
         <span>Conteudo Integral</span>
       </div>
       <p class="text-block" id="estudo-content"></p>
+      <div class="study-commentary-audio" id="study-commentary-audio-wrap" hidden>
+        <button class="ghost-btn study-commentary-audio-toggle" id="study-commentary-audio-toggle" type="button" aria-expanded="false">Ouvir audio do estudo biblico</button>
+        <div class="study-commentary-audio-player" id="study-commentary-audio-player-wrap">
+          <audio id="study-commentary-audio-player" controls preload="metadata"></audio>
+        </div>
+      </div>
       <a class="btn" id="additional-link" href="#" target="_blank" rel="noreferrer" hidden>Abrir estudo adicional</a>
     </section>
 
@@ -1055,6 +1093,7 @@
     let resolvedImageDir = 'Atos/At_1/img';
     let resolvedAdditionalUrl = '';
     let resolvedAudioPath = '';
+    let resolvedStudyCommentaryAudioPath = '';
     let studiesIndex = [];
     let studyPublicId = '';
 
@@ -1116,6 +1155,43 @@
 
         extList.forEach(function (ext) {
           candidates.push(audioDir + '/' + byReference + '.' + ext);
+        });
+      }
+
+      return Array.from(new Set(candidates.filter(Boolean)));
+    }
+
+    function deriveStudyCommentaryAudioCandidates() {
+      const normalizedMd = (resolvedMdPath || '').replace(/\\/g, '/');
+      const parts = normalizedMd.split('/');
+      const mdFile = parts.pop() || '';
+      const baseDir = parts.join('/');
+      const baseName = mdFile.replace(/\.[^.]+$/, '');
+      const audioDir = (baseDir ? baseDir + '/audio' : 'audio');
+      const extList = ['mp3', 'm4a', 'wav', 'ogg', 'webm'];
+      const candidates = [];
+
+      if (resolvedStudy && resolvedStudy.studyAudioPath) {
+        candidates.push(String(resolvedStudy.studyAudioPath));
+      }
+      if (resolvedStudy && resolvedStudy.audioStudyPath) {
+        candidates.push(String(resolvedStudy.audioStudyPath));
+      }
+
+      extList.forEach(function (ext) {
+        candidates.push(audioDir + '/' + baseName + '_estudo.' + ext);
+      });
+
+      if (resolvedStudy) {
+        const byReference = [
+          toAsciiSlug(resolvedStudy.livro),
+          Number(resolvedStudy.capitulo),
+          Number(resolvedStudy.versiculoInicio),
+          Number(resolvedStudy.versiculoFim)
+        ].join('_');
+
+        extList.forEach(function (ext) {
+          candidates.push(audioDir + '/' + byReference + '_estudo.' + ext);
         });
       }
 
@@ -1191,6 +1267,44 @@
       setStudyAudioPlayer(Boolean(resolvedAudioPath), resolvedAudioPath);
     }
 
+    function setStudyCommentaryAudioPlayer(visible, audioPath) {
+      const wrap = document.getElementById('study-commentary-audio-wrap');
+      const toggle = document.getElementById('study-commentary-audio-toggle');
+      const playerWrap = document.getElementById('study-commentary-audio-player-wrap');
+      const player = document.getElementById('study-commentary-audio-player');
+      if (!wrap || !toggle || !playerWrap || !player) {
+        return;
+      }
+
+      if (!visible || !audioPath) {
+        wrap.hidden = true;
+        toggle.setAttribute('aria-expanded', 'false');
+        playerWrap.classList.remove('open');
+        player.pause();
+        player.removeAttribute('src');
+        player.load();
+        return;
+      }
+
+      wrap.hidden = false;
+      toggle.textContent = 'Ouvir audio do estudo biblico';
+      player.src = audioPath;
+    }
+
+    async function setupStudyCommentaryAudioPlayer() {
+      resolvedStudyCommentaryAudioPath = '';
+      const candidates = deriveStudyCommentaryAudioCandidates();
+      for (const candidate of candidates) {
+        // Tenta localizar o primeiro arquivo de audio do estudo valido.
+        if (await probeAudioPath(candidate)) {
+          resolvedStudyCommentaryAudioPath = candidate;
+          break;
+        }
+      }
+
+      setStudyCommentaryAudioPlayer(Boolean(resolvedStudyCommentaryAudioPath), resolvedStudyCommentaryAudioPath);
+    }
+
     function initStudyAudioToggle() {
       const toggle = document.getElementById('study-audio-toggle');
       const playerWrap = document.getElementById('study-audio-player-wrap');
@@ -1206,6 +1320,28 @@
         toggle.textContent = nextOpen
           ? 'Ocultar leitura em audio'
           : 'Ouvir leitura do texto biblico';
+
+        if (!nextOpen) {
+          player.pause();
+        }
+      });
+    }
+
+    function initStudyCommentaryAudioToggle() {
+      const toggle = document.getElementById('study-commentary-audio-toggle');
+      const playerWrap = document.getElementById('study-commentary-audio-player-wrap');
+      const player = document.getElementById('study-commentary-audio-player');
+      if (!toggle || !playerWrap || !player) {
+        return;
+      }
+
+      toggle.addEventListener('click', function () {
+        const nextOpen = !playerWrap.classList.contains('open');
+        playerWrap.classList.toggle('open', nextOpen);
+        toggle.setAttribute('aria-expanded', String(nextOpen));
+        toggle.textContent = nextOpen
+          ? 'Ocultar audio do estudo biblico'
+          : 'Ouvir audio do estudo biblico';
 
         if (!nextOpen) {
           player.pause();
@@ -1302,6 +1438,7 @@
         resolvedImageDir = found.imageDir || deriveImageDirFromMarkdownPath(found.markdownPath);
         resolvedAdditionalUrl = found.additionalStudyUrl || '';
         resolvedAudioPath = found.audioPath || '';
+        resolvedStudyCommentaryAudioPath = found.studyAudioPath || found.audioStudyPath || '';
         return;
       }
 
@@ -2096,6 +2233,7 @@
         }
 
         await setupStudyAudioPlayer();
+        await setupStudyCommentaryAudioPlayer();
 
         renderImages(title, imageNames);
         studyPublicId = (resolvedStudy && resolvedStudy.id)
@@ -2174,6 +2312,7 @@
     initQuickStudyPicker();
     initTranslationBadges();
     initStudyAudioToggle();
+    initStudyCommentaryAudioToggle();
     renderFromMarkdown();
   </script>
 </body>
