@@ -1,7 +1,11 @@
 (function () {
   const config = window.BIBLIA_SUPABASE_CONFIG || {};
+  const authGate = window.BIBLIA_AUTH_GATE || {};
   const hasConfig = Boolean(config.url && config.anonKey);
   const ADMIN_ACCESS_EMAIL = 'rodrigo.lara@rede.ulbra.br';
+  const requireLogin = Boolean(authGate.requireLogin);
+  const redirectIfUnauthenticated = String(authGate.redirectIfUnauthenticated || '').trim();
+  const redirectIfAuthenticated = String(authGate.redirectIfAuthenticated || '').trim();
 
   let currentUserId = '';
   let currentUserEmail = '';
@@ -309,6 +313,14 @@
     const loginReset = loginOverlay.querySelector('#login-reset');
     const loginStatus = loginOverlay.querySelector('#login-status');
 
+    function redirectTo(url) {
+      if (!url) return;
+      const target = new URL(url, window.location.href);
+      if (target.href !== window.location.href) {
+        window.location.assign(target.href);
+      }
+    }
+
     const accStatus = accountOverlay.querySelector('#account-status');
     const accSetPassword = accountOverlay.querySelector('#acc-set-password');
     const accNewPassword = accountOverlay.querySelector('#acc-new-password');
@@ -414,6 +426,9 @@
     }
 
     function closeOverlay(overlay) {
+      if (overlay === loginOverlay && requireLogin && !currentUserId) {
+        return;
+      }
       overlay.classList.remove('open');
     }
 
@@ -555,6 +570,12 @@
         menuAccount.style.display = 'flex';
         menuLogout.style.display = 'flex';
         loadProfile(user.id);
+        closeOverlay(loginOverlay);
+
+        if (redirectIfAuthenticated) {
+          redirectTo(redirectIfAuthenticated);
+          return;
+        }
       } else {
         currentUserEmail = '';
         avatarEl.style.display = 'none';
@@ -566,7 +587,22 @@
         menuAccount.style.display = 'none';
         menuLogout.style.display = 'none';
         currentUserId = '';
+
+        if (redirectIfUnauthenticated) {
+          redirectTo(redirectIfUnauthenticated);
+          return;
+        }
+
+        if (requireLogin) {
+          setStatus(loginStatus, 'Entre para continuar.', '');
+          openOverlay(loginOverlay);
+          loginEmail.focus();
+        }
       }
+
+      document.dispatchEvent(new CustomEvent('biblia-auth-state', {
+        detail: { user: user, session: session || null }
+      }));
     }
 
     function syncAnalyticsFilters() {

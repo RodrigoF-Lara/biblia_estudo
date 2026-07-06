@@ -3,30 +3,71 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Biblia Estudo</title>
-  <meta http-equiv="refresh" content="0; url=busca_estudo.html" />
+  <title>Biblia Estudo | Login</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Source+Sans+3:wght@400;600;700&display=swap');
+
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f6f1e8;
-      color: #2f2418;
+      font-family: 'Source Sans 3', sans-serif;
+      background:
+        radial-gradient(circle at 12% 15%, #e9dcc6 0%, transparent 36%),
+        radial-gradient(circle at 88% 85%, #ddcdb4 0%, transparent 34%),
+        #f2e9da;
+      color: #2a2219;
       display: grid;
       place-items: center;
       min-height: 100vh;
-      text-align: center;
       padding: 24px;
     }
-    a {
-      color: #8a5a2b;
+
+    .panel {
+      width: min(760px, 100%);
+      background: rgba(250, 245, 236, 0.96);
+      border: 1px solid #d9ccb8;
+      border-radius: 18px;
+      box-shadow: 0 20px 36px rgba(44, 34, 22, 0.14);
+      padding: 28px;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(34px, 5vw, 52px);
+      letter-spacing: 0.4px;
+      line-height: 1;
+    }
+
+    p {
+      margin: 10px 0 0;
+      font-size: 18px;
+      color: #5f5346;
+      max-width: 620px;
+      line-height: 1.5;
+    }
+
+    .note {
+      margin-top: 18px;
+      font-size: 14px;
+      color: #7b6d5d;
     }
   </style>
 </head>
 <body>
-  <main>
+  <main class="panel">
     <h1>Biblia Estudo</h1>
-    <p>Redirecionando para a busca de estudos...</p>
-    <p>Se o redirecionamento nao acontecer, <a href="busca_estudo.html">clique aqui</a>.</p>
+    <p>Acesso restrito para usuarios autenticados. Faca login para entrar na plataforma.</p>
+    <p class="note">A janela de login abre automaticamente.</p>
   </main>
+
+  <script>
+    window.BIBLIA_AUTH_GATE = {
+      requireLogin: true,
+      redirectIfAuthenticated: 'busca_estudo.html'
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="auth_widget.js"></script>
 </body>
 </html>
