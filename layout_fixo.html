@@ -202,6 +202,39 @@
       font-size: 14px;
     }
 
+    .study-audio-inline {
+      margin-top: 8px;
+      display: grid;
+      gap: 6px;
+      width: min(360px, 100%);
+    }
+
+    .study-audio-inline button {
+      border: 1px solid #c7b9a5;
+      background: #f8f1e3;
+      color: #46372a;
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .study-audio-inline button:hover {
+      background: #f2e8d7;
+    }
+
+    .study-audio-inline audio {
+      width: 100%;
+      display: none;
+    }
+
+    .study-audio-inline audio.open {
+      display: block;
+    }
+
     .left-grid {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr 1.45fr;
@@ -589,6 +622,10 @@
               </div>
             </div>
             <p>Painel de estudo: texto biblico em paralelo e comentario expositivo</p>
+            <div class="study-audio-inline" id="study-audio-wrap" hidden>
+              <button type="button" id="study-audio-toggle" aria-expanded="false">Ouvir leitura do texto biblico</button>
+              <audio id="study-audio-player" controls preload="metadata"></audio>
+            </div>
           </div>
 
           <aside class="qr-corner" id="qr-left-wrap" hidden>
@@ -686,6 +723,7 @@
     let resolvedMdPath = requestedMdPath || 'Atos/At_1/1_5.md';
     let resolvedImageDir = 'Atos/At_1/img';
     let resolvedAdditionalUrl = '';
+    let resolvedAudioPath = '';
     let studiesIndex = [];
     let currentStudyText = '';
 
@@ -694,6 +732,139 @@
       const parts = normalized.split('/');
       parts.pop();
       return (parts.join('/') || '.') + '/img';
+    }
+
+    function toAsciiSlug(value) {
+      return String(value || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_+|_+$/g, '');
+    }
+
+    function deriveAudioCandidates() {
+      const normalizedMd = (resolvedMdPath || '').replace(/\\/g, '/');
+      const parts = normalizedMd.split('/');
+      const mdFile = parts.pop() || '';
+      const baseDir = parts.join('/');
+      const baseName = mdFile.replace(/\.[^.]+$/, '');
+      const audioDir = (baseDir ? baseDir + '/audio' : 'audio');
+      const extList = ['mp3', 'm4a', 'wav', 'ogg', 'webm'];
+      const candidates = [];
+
+      if (resolvedStudy && resolvedStudy.audioPath) {
+        candidates.push(String(resolvedStudy.audioPath));
+      }
+
+      extList.forEach(function (ext) {
+        candidates.push(audioDir + '/' + baseName + '.' + ext);
+      });
+
+      if (resolvedStudy) {
+        const byReference = [
+          toAsciiSlug(resolvedStudy.livro),
+          Number(resolvedStudy.capitulo),
+          Number(resolvedStudy.versiculoInicio),
+          Number(resolvedStudy.versiculoFim)
+        ].join('_');
+
+        extList.forEach(function (ext) {
+          candidates.push(audioDir + '/' + byReference + '.' + ext);
+        });
+      }
+
+      return Array.from(new Set(candidates.filter(Boolean)));
+    }
+
+    async function probeAudioPath(path) {
+      try {
+        const response = await fetch(path, { method: 'HEAD' });
+        if (response.ok) {
+          return true;
+        }
+        if (response.status && response.status !== 405 && response.status !== 501) {
+          return false;
+        }
+      } catch (_) {
+        // Fallback para servidores que nao aceitam HEAD.
+      }
+
+      return new Promise(function (resolve) {
+        const audio = new Audio();
+        let settled = false;
+        const finish = function (value) {
+          if (settled) return;
+          settled = true;
+          audio.removeAttribute('src');
+          audio.load();
+          resolve(value);
+        };
+
+        audio.preload = 'metadata';
+        audio.addEventListener('loadedmetadata', function () { finish(true); }, { once: true });
+        audio.addEventListener('error', function () { finish(false); }, { once: true });
+        audio.src = path;
+      });
+    }
+
+    function setStudyAudioPlayer(visible, audioPath) {
+      const wrap = document.getElementById('study-audio-wrap');
+      const toggle = document.getElementById('study-audio-toggle');
+      const player = document.getElementById('study-audio-player');
+      if (!wrap || !toggle || !player) {
+        return;
+      }
+
+      if (!visible || !audioPath) {
+        wrap.hidden = true;
+        toggle.setAttribute('aria-expanded', 'false');
+        player.classList.remove('open');
+        player.pause();
+        player.removeAttribute('src');
+        player.load();
+        return;
+      }
+
+      wrap.hidden = false;
+      toggle.textContent = 'Ouvir leitura do texto biblico';
+      toggle.setAttribute('aria-expanded', 'false');
+      player.classList.remove('open');
+      player.src = audioPath;
+    }
+
+    async function setupStudyAudioPlayer() {
+      resolvedAudioPath = '';
+      const candidates = deriveAudioCandidates();
+      for (const candidate of candidates) {
+        // Tenta localizar o primeiro arquivo de audio valido para este estudo.
+        if (await probeAudioPath(candidate)) {
+          resolvedAudioPath = candidate;
+          break;
+        }
+      }
+      setStudyAudioPlayer(Boolean(resolvedAudioPath), resolvedAudioPath);
+    }
+
+    function initStudyAudioToggle() {
+      const toggle = document.getElementById('study-audio-toggle');
+      const player = document.getElementById('study-audio-player');
+      if (!toggle || !player) {
+        return;
+      }
+
+      toggle.addEventListener('click', function () {
+        const nextOpen = !player.classList.contains('open');
+        player.classList.toggle('open', nextOpen);
+        toggle.setAttribute('aria-expanded', String(nextOpen));
+        toggle.textContent = nextOpen
+          ? 'Ocultar leitura em audio'
+          : 'Ouvir leitura do texto biblico';
+
+        if (!nextOpen) {
+          player.pause();
+        }
+      });
     }
 
     async function resolveStudyConfig() {
@@ -720,6 +891,7 @@
         resolvedMdPath = found.markdownPath;
         resolvedImageDir = found.imageDir || deriveImageDirFromMarkdownPath(found.markdownPath);
         resolvedAdditionalUrl = found.additionalStudyUrl || '';
+        resolvedAudioPath = found.audioPath || '';
         return;
       }
 
@@ -1032,6 +1204,7 @@
         document.getElementById('nvi-content').textContent = getSection(sections, ['nvi']);
         document.getElementById('naa-content').textContent = getSection(sections, ['naa']);
         document.getElementById('nlt-content').textContent = getSection(sections, ['nlt (ingles)', 'nlt', 'ntl (ingles)', 'ntl']);
+        await setupStudyAudioPlayer();
         fitScriptureColumns();
         const estudoCompleto = normalizeStudyText(getSection(sections, ['estudo biblico', 'estudo ia']));
         currentStudyText = estudoCompleto;
@@ -1132,6 +1305,7 @@
       }
     });
 
+    initStudyAudioToggle();
     renderFromMarkdown();
   </script>
 </body>

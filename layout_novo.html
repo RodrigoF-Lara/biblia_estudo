@@ -255,6 +255,44 @@
       letter-spacing: 0.1px;
     }
 
+    .study-audio-wrap {
+      width: 100%;
+      display: grid;
+      gap: 8px;
+    }
+
+    .study-audio-toggle {
+      cursor: pointer;
+      font: inherit;
+      color: #f6fbfa;
+      justify-content: flex-start;
+      min-height: 34px;
+      text-align: left;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .study-audio-toggle:hover {
+      background: rgba(255, 255, 255, 0.24);
+      border-color: rgba(255, 255, 255, 0.54);
+    }
+
+    .study-audio-player {
+      display: none;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 12px;
+      background: rgba(8, 40, 35, 0.35);
+      padding: 8px;
+      width: min(440px, 100%);
+    }
+
+    .study-audio-player.open {
+      display: block;
+    }
+
+    .study-audio-player audio {
+      width: 100%;
+    }
+
     .stack {
       display: grid;
       gap: 16px;
@@ -834,6 +872,10 @@
         min-height: 30px;
       }
 
+      .study-audio-player {
+        width: 100%;
+      }
+
       .quick-grid {
         grid-template-columns: 1fr;
       }
@@ -863,6 +905,12 @@
       <p id="hero-subtitle">Visualizacao alternativa com os mesmos dados dos arquivos markdown.</p>
       <div class="hero-meta">
         <span class="pill" id="pill-ref">Referencia: --</span>
+        <div class="study-audio-wrap" id="study-audio-wrap" hidden>
+          <button class="pill study-audio-toggle" id="study-audio-toggle" type="button" aria-expanded="false">Ouvir leitura do texto biblico</button>
+          <div class="study-audio-player" id="study-audio-player-wrap">
+            <audio id="study-audio-player" controls preload="metadata"></audio>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -1004,6 +1052,7 @@
     let resolvedMdPath = requestedMdPath || 'Atos/At_1/1_5.md';
     let resolvedImageDir = 'Atos/At_1/img';
     let resolvedAdditionalUrl = '';
+    let resolvedAudioPath = '';
     let studiesIndex = [];
     let studyPublicId = '';
 
@@ -1026,6 +1075,140 @@
       const parts = normalized.split('/');
       parts.pop();
       return (parts.join('/') || '.') + '/img';
+    }
+
+    function toAsciiSlug(value) {
+      return String(value || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_+|_+$/g, '');
+    }
+
+    function deriveAudioCandidates() {
+      const normalizedMd = (resolvedMdPath || '').replace(/\\/g, '/');
+      const parts = normalizedMd.split('/');
+      const mdFile = parts.pop() || '';
+      const baseDir = parts.join('/');
+      const baseName = mdFile.replace(/\.[^.]+$/, '');
+      const audioDir = (baseDir ? baseDir + '/audio' : 'audio');
+      const extList = ['mp3', 'm4a', 'wav', 'ogg', 'webm'];
+      const candidates = [];
+
+      if (resolvedStudy && resolvedStudy.audioPath) {
+        candidates.push(String(resolvedStudy.audioPath));
+      }
+
+      extList.forEach(function (ext) {
+        candidates.push(audioDir + '/' + baseName + '.' + ext);
+      });
+
+      if (resolvedStudy) {
+        const byReference = [
+          toAsciiSlug(resolvedStudy.livro),
+          Number(resolvedStudy.capitulo),
+          Number(resolvedStudy.versiculoInicio),
+          Number(resolvedStudy.versiculoFim)
+        ].join('_');
+
+        extList.forEach(function (ext) {
+          candidates.push(audioDir + '/' + byReference + '.' + ext);
+        });
+      }
+
+      return Array.from(new Set(candidates.filter(Boolean)));
+    }
+
+    async function probeAudioPath(path) {
+      try {
+        const response = await fetch(path, { method: 'HEAD' });
+        if (response.ok) {
+          return true;
+        }
+        if (response.status && response.status !== 405 && response.status !== 501) {
+          return false;
+        }
+      } catch (_) {
+        // Fallback para servidores que nao aceitam HEAD.
+      }
+
+      return new Promise(function (resolve) {
+        const audio = new Audio();
+        let settled = false;
+        const finish = function (value) {
+          if (settled) return;
+          settled = true;
+          audio.removeAttribute('src');
+          audio.load();
+          resolve(value);
+        };
+
+        audio.preload = 'metadata';
+        audio.addEventListener('loadedmetadata', function () { finish(true); }, { once: true });
+        audio.addEventListener('error', function () { finish(false); }, { once: true });
+        audio.src = path;
+      });
+    }
+
+    function setStudyAudioPlayer(visible, audioPath) {
+      const wrap = document.getElementById('study-audio-wrap');
+      const toggle = document.getElementById('study-audio-toggle');
+      const playerWrap = document.getElementById('study-audio-player-wrap');
+      const player = document.getElementById('study-audio-player');
+      if (!wrap || !toggle || !playerWrap || !player) {
+        return;
+      }
+
+      if (!visible || !audioPath) {
+        wrap.hidden = true;
+        toggle.setAttribute('aria-expanded', 'false');
+        playerWrap.classList.remove('open');
+        player.pause();
+        player.removeAttribute('src');
+        player.load();
+        return;
+      }
+
+      wrap.hidden = false;
+      toggle.textContent = 'Ouvir leitura do texto biblico';
+      player.src = audioPath;
+    }
+
+    async function setupStudyAudioPlayer() {
+      resolvedAudioPath = '';
+      const candidates = deriveAudioCandidates();
+      for (const candidate of candidates) {
+        // Tenta localizar o primeiro arquivo de audio valido para este estudo.
+        if (await probeAudioPath(candidate)) {
+          resolvedAudioPath = candidate;
+          break;
+        }
+      }
+
+      setStudyAudioPlayer(Boolean(resolvedAudioPath), resolvedAudioPath);
+    }
+
+    function initStudyAudioToggle() {
+      const toggle = document.getElementById('study-audio-toggle');
+      const playerWrap = document.getElementById('study-audio-player-wrap');
+      const player = document.getElementById('study-audio-player');
+      if (!toggle || !playerWrap || !player) {
+        return;
+      }
+
+      toggle.addEventListener('click', function () {
+        const nextOpen = !playerWrap.classList.contains('open');
+        playerWrap.classList.toggle('open', nextOpen);
+        toggle.setAttribute('aria-expanded', String(nextOpen));
+        toggle.textContent = nextOpen
+          ? 'Ocultar leitura em audio'
+          : 'Ouvir leitura do texto biblico';
+
+        if (!nextOpen) {
+          player.pause();
+        }
+      });
     }
 
     function extractFirstUrl(text) {
@@ -1116,6 +1299,7 @@
         resolvedMdPath = found.markdownPath;
         resolvedImageDir = found.imageDir || deriveImageDirFromMarkdownPath(found.markdownPath);
         resolvedAdditionalUrl = found.additionalStudyUrl || '';
+        resolvedAudioPath = found.audioPath || '';
         return;
       }
 
@@ -1909,6 +2093,8 @@
           additionalLink.hidden = true;
         }
 
+        await setupStudyAudioPlayer();
+
         renderImages(title, imageNames);
         studyPublicId = (resolvedStudy && resolvedStudy.id)
           ? resolvedStudy.id
@@ -1985,6 +2171,7 @@
 
     initQuickStudyPicker();
     initTranslationBadges();
+    initStudyAudioToggle();
     renderFromMarkdown();
   </script>
 </body>
