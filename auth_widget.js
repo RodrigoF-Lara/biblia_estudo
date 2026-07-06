@@ -628,6 +628,33 @@
       const contentEl = document.getElementById('analytics-content');
       if (!statusEl || !contentEl) return;
 
+      const formatDateBr = function (isoDate) {
+        const value = String(isoDate || '');
+        if (!value) return '-';
+        const parts = value.split('-');
+        if (parts.length === 3) {
+          return parts[2] + '/' + parts[1] + '/' + parts[0];
+        }
+        const fallback = new Date(value);
+        if (Number.isNaN(fallback.getTime())) return value;
+        return new Intl.DateTimeFormat('pt-BR').format(fallback);
+      };
+
+      const formatDateTimeBr = function (isoDateTime) {
+        const value = String(isoDateTime || '');
+        if (!value) return '-';
+        const parsed = new Date(value);
+        if (Number.isNaN(parsed.getTime())) return value;
+        return new Intl.DateTimeFormat('pt-BR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        }).format(parsed);
+      };
+
       if (!currentUserId || !isAdminAccessEmail(currentUserEmail)) {
         statusEl.textContent = 'Painel restrito a conta administradora.';
         contentEl.innerHTML = '<div class="analytics-empty">Acesso restrito.</div>';
@@ -781,7 +808,7 @@
         const dailyRows = daily.length
           ? daily.map(function (row) {
               return '<tr>' +
-                '<td>' + row.access_day + '</td>' +
+                '<td>' + formatDateBr(row.access_day) + '</td>' +
                 '<td>' + (row.total_events || 0) + '</td>' +
                 '<td>' + (row.page_views || 0) + '</td>' +
                 '<td>' + (row.study_views || 0) + '</td>' +
@@ -795,7 +822,7 @@
         const studyRows = studies.length
           ? studies.map(function (row) {
               return '<tr>' +
-                '<td>' + row.access_day + '</td>' +
+                '<td>' + formatDateBr(row.access_day) + '</td>' +
                 '<td>' + (row.study_ref || row.study_id || '-') + '</td>' +
                 '<td>' + (row.study_title || '-') + '</td>' +
                 '<td>' + (row.total_events || 0) + '</td>' +
@@ -811,8 +838,9 @@
             const actorIp = row.actor_ip || '-';
             const actorKind = row.user_id ? 'Logado' : 'Anonimo';
             const target = row.study_ref || row.study_title || row.study_id || '-';
+            const when = row.occurred_at ? formatDateTimeBr(row.occurred_at) : formatDateBr(row.access_day);
             return '<tr>' +
-              '<td>' + (row.access_day || (row.occurred_at ? String(row.occurred_at).slice(0, 10) : '-')) + '</td>' +
+              '<td>' + when + '</td>' +
               '<td>' + actorName + '</td>' +
               '<td>' + actorCity + '</td>' +
               '<td>' + actorIp + '</td>' +
@@ -826,7 +854,7 @@
           '<div class="analytics-section">' +
             '<h3>Filtros ativos</h3>' +
             '<div class="body">' +
-              '<div class="analytics-empty">' + (startIso && endIso ? (startIso + ' ate ' + endIso) : 'Periodo recente') + '</div>' +
+              '<div class="analytics-empty">' + (startIso && endIso ? (formatDateBr(startIso) + ' ate ' + formatDateBr(endIso)) : 'Periodo recente') + '</div>' +
             '</div>' +
           '</div>' +
           '<div class="analytics-section">' +
@@ -853,7 +881,7 @@
             '<h3>Acessos recentes</h3>' +
             '<div class="body scroll">' +
               '<table class="analytics-table">' +
-                '<thead><tr><th>Dia</th><th>Nome</th><th>Cidade</th><th>IP</th><th>Tipo</th><th>Evento</th><th>Estudo</th></tr></thead>' +
+                '<thead><tr><th>Data/Hora</th><th>Nome</th><th>Cidade</th><th>IP</th><th>Tipo</th><th>Evento</th><th>Estudo</th></tr></thead>' +
                 '<tbody>' + recentRows + '</tbody>' +
               '</table>' +
             '</div>' +
