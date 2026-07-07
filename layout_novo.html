@@ -1377,6 +1377,28 @@
         .trim();
     }
 
+    function escapeHtml(text) {
+      return String(text || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function renderStudyMarkup(text) {
+      return String(text || '')
+        .split(/(\[[^\]]+\]\(https?:\/\/[^\s)]+\))/gi)
+        .map(function (segment) {
+          const match = segment.match(/^\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)$/i);
+          if (match) {
+            return '<a href="' + escapeHtml(match[2]) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(match[1]) + '</a>';
+          }
+          return escapeHtml(segment);
+        })
+        .join('');
+    }
+
     async function resolveStudyConfig() {
       if (!requestedStudyId && !requestedMdPath) {
         resolvedImageDir = deriveImageDirFromMarkdownPath(resolvedMdPath);
@@ -2187,7 +2209,7 @@
         document.getElementById('nvi-content').textContent = nvi || 'Sem conteudo NVI neste estudo.';
         document.getElementById('naa-content').textContent = naa || 'Sem conteudo NAA neste estudo.';
         document.getElementById('nlt-content').textContent = nlt || 'Sem conteudo NLT neste estudo.';
-        document.getElementById('estudo-content').textContent = estudoCompleto || 'Sem secao de estudo biblico neste markdown.';
+        document.getElementById('estudo-content').innerHTML = renderStudyMarkup(estudoCompleto || 'Sem secao de estudo biblico neste markdown.');
 
         const additionalLink = document.getElementById('additional-link');
         if (finalAdditionalUrl) {

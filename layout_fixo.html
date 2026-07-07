@@ -1042,6 +1042,28 @@
         .trim();
     }
 
+    function escapeHtml(text) {
+      return String(text || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function renderStudyMarkup(text) {
+      return String(text || '')
+        .split(/(\[[^\]]+\]\(https?:\/\/[^\s)]+\))/gi)
+        .map(function (segment) {
+          const match = segment.match(/^\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)$/i);
+          if (match) {
+            return '<a href="' + escapeHtml(match[2]) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(match[1]) + '</a>';
+          }
+          return escapeHtml(segment);
+        })
+        .join('');
+    }
+
     function fitScriptureColumns() {
       const ids = ['nvi-content', 'naa-content', 'nlt-content'];
       const pairs = ids
@@ -1165,14 +1187,14 @@
       rightLayout.classList.remove('no-overflow');
 
       const part1 = splitTextByRenderedHeight(estudoCompleto, studyMainEl, studyMainBody);
-      studyMainEl.textContent = part1.main;
+      studyMainEl.innerHTML = renderStudyMarkup(part1.main);
 
       const part2 = splitTextByRenderedHeight(part1.overflow, studyLeftOverflowEl, studyLeftOverflowBody);
-      studyLeftOverflowEl.textContent = part2.main;
+      studyLeftOverflowEl.innerHTML = renderStudyMarkup(part2.main);
       leftOverflowWrap.hidden = !part2.main;
 
       // A pagina 2 nao tem limite de altura: recebe todo o restante do estudo sem cortes.
-      studyRightOverflowEl.textContent = part2.overflow || '';
+      studyRightOverflowEl.innerHTML = renderStudyMarkup(part2.overflow || '');
       rightOverflowWrap.hidden = !part2.overflow;
       rightLayout.classList.toggle('no-overflow', !part2.overflow);
       incompleteNote.hidden = true;
