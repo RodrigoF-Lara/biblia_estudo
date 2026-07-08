@@ -9,6 +9,7 @@
       "titulo": "Atos 1:1-5",
       "markdownPath": "Atos/At_1/1_5.md",
       "audioPath": "Atos/At_1/audio/atos_1_1_5.mp3",
+      "studyAudioPath": "Atos/At_1/audio/atos_1_1_5_estudo.mp3",
       "imageDir": "Atos/At_1/img",
       "additionalStudyUrl": "https://drive.google.com/file/d/1UjmPvTefNTzwePmzRKvsOEgwNY7wjMDF/view?usp=drive_link",
       "layout": "v2"
@@ -21,7 +22,8 @@
       "versiculoFim": 11,
       "titulo": "Atos 1:6-11",
       "markdownPath": "Atos/At_1/6_11.md",
-      "audioPath": "Atos/At_1/audio/atos_1_6_11.mp3",
+      "audioPath": "Atos/At_1/audio/atos_1_6_11.m4a",
+      "studyAudioPath": "Atos/At_1/audio/atos_1_6_11_estudo.m4a",
       "imageDir": "Atos/At_1/img",
       "additionalStudyUrl": "https://drive.google.com/file/d/1UjmPvTefNTzwePmzRKvsOEgwNY7wjMDF/view?usp=drive_link",
       "layout": "v2"
